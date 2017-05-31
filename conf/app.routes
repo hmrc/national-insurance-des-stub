@@ -1,3 +1,3 @@
 # microservice specific routes
 
-GET        /hello-world             uk.gov.hmrc.nationalinsurancedesstub.controllers.MicroserviceHelloWorld.hello
+GET        /nics/utr/:utr/year/:taxYear/summary             @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummary.fetch(utr, taxYear)

@@ -36,6 +36,9 @@ trait MicroService {
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
       routesGenerator := StaticRoutesGenerator
     )
+    .settings(
+      unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
+    )
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
     .settings(
