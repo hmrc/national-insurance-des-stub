@@ -1,0 +1,49 @@
+#%RAML 1.0
+---
+
+title: National Insurance Test Support
+version: 1.0
+protocols: [ HTTPS ]
+baseUri: https://api.service.hmrc.gov.uk/
+
+documentation:
+ - title: Overview
+   content: !include docs/overview.md
+ - title: Versioning
+   content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
+ - title: Errors
+   content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/errors.md
+
+mediaType: [ application/json ]
+
+uses:
+  sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
+  headers: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml
+  annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
+  types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+
+/national-insurance-test-support:
+  /sa:
+    /{utr}:
+      uriParameters:
+        utr:
+          description: The 10 digit self-assessment UTR for the individual.
+          type: string
+          example: "2234567890"
+      /annual-summary:
+        /{taxYear}:
+          uriParameters:
+            taxYear:
+              description: The tax year for the National Insurance contribution being created.
+              type: types.taxYear
+          post:
+            displayName: Create National Insurance summary test data
+            description: Lets you create National Insurance contributions test data
+            is: [headers.acceptHeader]
+            securedBy: [ sec.x-application ]
+            body:
+              application/json:
+                # schema: !include schemas/create-summary-request.json
+                example: !include examples/create-summary-request.json
+            responses:
+              201:

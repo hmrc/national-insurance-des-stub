@@ -44,6 +44,11 @@
     </logger>
 
     <logger name="com.google.inject" level="INFO"/>
+    <logger name="javax.management" level="INFO"/>
+    <logger name="akka.event" level="INFO"/>
+    <logger name="org.asynchttpclient.netty" level="INFO"/>
+    <logger name="io.netty" level="INFO"/>
+    <logger name="org.mortbay.log" level="INFO"/>
 
     <logger name="uk.gov" level="INFO"/>
 

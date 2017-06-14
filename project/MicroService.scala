@@ -23,6 +23,9 @@ trait MicroService {
   lazy val plugins : Seq[Plugins] = Seq.empty
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
+  def unitFilter(name: String): Boolean = name startsWith "unit"
+  def itTestFilter(name: String): Boolean = name startsWith "it"
+
 
   lazy val microservice = Project(appName, file("."))
     .enablePlugins(Seq(play.sbt.PlayScala,SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
@@ -39,11 +42,15 @@ trait MicroService {
     .settings(
       unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
     )
+    .settings(testOptions in Test := Seq(Tests.Filter(unitFilter)),
+      addTestReportOption(Test, "test-reports")
+    )
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
     .settings(
       Keys.fork in IntegrationTest := false,
-      unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "it")),
+      testOptions in IntegrationTest := Seq(Tests.Filter(itTestFilter)),
+      unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "test")),
       addTestReportOption(IntegrationTest, "int-test-reports"),
       testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
       parallelExecution in IntegrationTest := false)

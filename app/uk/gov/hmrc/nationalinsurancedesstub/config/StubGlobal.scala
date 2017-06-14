@@ -16,28 +16,59 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.config
 
-import javax.inject.{Inject, Singleton}
-
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
-import play.api.Configuration
-import play.api.http.DefaultHttpFilters
-import uk.gov.hmrc.play.config.ControllerConfig
+import play.api.Play._
+import play.api.{Application, Play}
+import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
+import uk.gov.hmrc.api.connector.ServiceLocatorConnector
+import uk.gov.hmrc.play.audit.filters.AuditFilter
+import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
+import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
+import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 
 
-@Singleton
-class ControllerConfiguration @Inject()(configuration: Configuration) extends ControllerConfig {
-  lazy val controllerConfigs = configuration.underlying.as[Config]("controllers")
+object ControllerConfiguration extends ControllerConfig {
+  lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
 }
 
-@Singleton
-class MicroserviceLoggingFilter @Inject()(configuration: ControllerConfiguration)
-  extends LoggingFilter with MicroserviceFilterSupport {
-
-  override def controllerNeedsLogging(controllerName: String) = configuration.paramsForController(controllerName).needsLogging
+object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
+  lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
 }
 
-@Singleton
-class Filters @Inject() (loggingFilter: MicroserviceLoggingFilter) extends DefaultHttpFilters (loggingFilter)
+object MicroserviceAuditConnector extends AuditConnector with RunMode {
+  override lazy val auditingConfig = LoadAuditingConfig(s"$env.auditing")
+}
+
+object MicroserviceAuditFilter extends AuditFilter with AppName with MicroserviceFilterSupport {
+
+  override val auditConnector = MicroserviceAuditConnector
+
+  override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
+}
+
+object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSupport {
+
+  override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
+}
+
+object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorRegistration with ServiceLocatorConfig
+  with RunMode with MicroserviceFilterSupport {
+
+  override val loggingFilter = MicroserviceLoggingFilter
+  override val microserviceAuditFilter = MicroserviceAuditFilter
+  override val auditConnector = MicroserviceAuditConnector
+  override val authFilter = None
+
+  override val hc = HeaderCarrier()
+  override val slConnector = ServiceLocatorConnector(WSHttp)
+  override lazy val registrationEnabled = current.configuration.getBoolean(s"$env.microservice.services.service-locator.enabled").getOrElse(true)
+
+  override def microserviceMetricsConfig(implicit app: Application) = app.configuration.getConfig("microservice.metrics")
+
+}

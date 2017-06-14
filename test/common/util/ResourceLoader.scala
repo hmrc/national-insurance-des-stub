@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationalinsurancedesstub.controllers
+package common.util
 
-import play.api.mvc._
-import uk.gov.hmrc.nationalinsurancedesstub.common.StubResource
-import uk.gov.hmrc.play.microservice.controller.BaseController
+import scala.io.Source
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+trait ResourceLoader {
 
-class NationalInsuranceSummary extends BaseController with StubResource {
-
-	def fetch(utr: String, taxYear: String) = Action.async { implicit request =>
-		Future(resourceAsResponse("/public/national-insurance-summary.json"))
-	}
+  def loadResource(path: String): String = {
+    val resource = getClass.getResourceAsStream(path)
+    try Source.fromInputStream(resource).mkString
+    finally resource.close
+  }
 }
+
+object ResourceLoader extends ResourceLoader
