@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationalinsurancedesstub.util
+package uk.gov.hmrc.nationalinsurancedesstub.config
 
-import scala.io.Source
+import javax.inject.Singleton
 
-trait ResourceLoader {
+import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
+import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
+import uk.gov.hmrc.play.http.hooks.HttpHook
+import uk.gov.hmrc.play.http.ws._
 
-  def loadResource(path: String): String = {
-    val resource = getClass.getResourceAsStream(path)
-    try Source.fromInputStream(resource).mkString
-    finally resource.close
-  }
+object WSHttp extends WSGet with WSPut with WSPost with WSDelete with WSPatch with AppName {
+  override val hooks: Seq[HttpHook] = NoneRequired
 }
-
-object ResourceLoader extends ResourceLoader

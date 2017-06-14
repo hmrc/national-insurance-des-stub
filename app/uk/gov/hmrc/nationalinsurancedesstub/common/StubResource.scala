@@ -16,30 +16,24 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.common
 
-import java.io.InputStream
+import java.io.{FileNotFoundException, InputStream}
 
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Results
 
+import scala.concurrent.Future
 import scala.io.Source
 
 trait StubResource extends Results {
 
-  def resourceAsResponse(path: String) = {
-    findResource(path) match {
-      case Some(content) => Ok(Json.parse(content))
-      case _ => NotFound
-    }
-  }
-
-  def findResource(path: String): Option[String] = {
+  def findResource(path: String): Future[String] = {
     val resource = getClass.getResourceAsStream(path)
     if (resource == null) {
       Logger.warn(s"Could not find resource '$path'")
-      None
+      Future.failed(new FileNotFoundException(path))
     } else {
-      Some(readStreamToString(resource))
+      Future.successful(readStreamToString(resource))
     }
   }
 
