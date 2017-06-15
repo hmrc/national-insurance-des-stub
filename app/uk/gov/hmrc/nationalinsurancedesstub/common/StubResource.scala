@@ -19,7 +19,6 @@ package uk.gov.hmrc.nationalinsurancedesstub.common
 import java.io.{FileNotFoundException, InputStream}
 
 import play.api.Logger
-import play.api.libs.json.Json
 import play.api.mvc.Results
 
 import scala.concurrent.Future
