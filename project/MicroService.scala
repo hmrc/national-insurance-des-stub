@@ -1,6 +1,7 @@
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
+import play.sbt.routes.RoutesKeys.{routesImport, routesGenerator}
 import play.routes.compiler.StaticRoutesGenerator
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
@@ -39,6 +40,7 @@ trait MicroService {
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
       routesGenerator := StaticRoutesGenerator
     )
+      .settings(routesImport += "uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders._")
     .settings(
       unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
     )

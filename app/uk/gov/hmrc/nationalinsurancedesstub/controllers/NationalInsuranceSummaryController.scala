@@ -18,8 +18,9 @@ package uk.gov.hmrc.nationalinsurancedesstub.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc._
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.common.StubResource
-import uk.gov.hmrc.nationalinsurancedesstub.models.NationalInsuranceSummary
+import uk.gov.hmrc.nationalinsurancedesstub.models.{NationalInsuranceSummary, TaxYear}
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
@@ -28,22 +29,23 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait NationalInsuranceSummaryController extends BaseController with StubResource {
   val repository: NationalInsuranceSummaryRepository
 
-  def fetch(utr: String, taxYear: String) = Action.async { implicit request =>
+  def fetch(utr: String, taxEndYear: String) = Action.async { implicit request =>
+    val nationalInsuranceSummaryFuture = repository.fetch(utr, taxEndYear)
+    val documentFuture = findResource("/public/national-insurance-summary.json")
+
     (for {
-      nationalInsuranceSummary <- repository.fetch(utr, taxYear)
-      document <- findResource("/public/national-insurance-summary.json")
-    } yield {
-      nationalInsuranceSummary match {
-        case Some(_) => Ok(Json.parse(document))
-        case _ => NotFound
-      }
+      nationalInsuranceSummary <- nationalInsuranceSummaryFuture
+      document <- documentFuture
+    } yield nationalInsuranceSummary match {
+      case Some(_) => Ok(Json.parse(document))
+      case _ => NotFound
     }) recover {
       case _ => InternalServerError
     }
   }
 
-  def create(utr: String, fullTaxYear: String) = Action.async { implicit request =>
-    repository.store(NationalInsuranceSummary(utr, fullTaxYear.substring(0, 4))) map {
+  def create(saUtr: SaUtr, taxYear: TaxYear) = Action.async { implicit request =>
+    repository.store(NationalInsuranceSummary(saUtr.utr, taxYear.endYr)) map {
       _ => Created
     } recover {
       case _ => InternalServerError
