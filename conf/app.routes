@@ -1,3 +1,13 @@
 # microservice specific routes
 
-GET        /nics/utr/:utr/year/:taxYear/summary             @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummary.fetch(utr, taxYear)
+# DES endpoints
+
+GET   /nics/utr/:utr/year/:taxYear/summary                               @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryControllerImpl.fetch(utr, taxYear)
+
+
+# Test support API endpoints
+
+GET   /api/definition              @uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.definition()
+GET   /api/conf/:version/*file     @uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.raml(version, file)
+
+POST  /national-insurance-test-support/sa/:utr/annual-summary/:taxYear   @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryControllerImpl.create(utr: uk.gov.hmrc.domain.SaUtr, taxYear: uk.gov.hmrc.nationalinsurancedesstub.models.TaxYear)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationalinsurancedesstub.util
+package common.util
 
 import scala.io.Source
 
