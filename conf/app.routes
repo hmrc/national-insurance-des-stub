@@ -10,4 +10,4 @@ GET   /nics/utr/:utr/year/:taxYear/summary                               @uk.gov
 GET   /api/definition              @uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.definition()
 GET   /api/conf/:version/*file     @uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.raml(version, file)
 
-POST  /national-insurance-test-support/sa/:utr/annual-summary/:taxYear   @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryControllerImpl.create(utr, taxYear)
+POST  /national-insurance-test-support/sa/:utr/annual-summary/:taxYear   @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryControllerImpl.create(utr: uk.gov.hmrc.domain.SaUtr, taxYear: uk.gov.hmrc.nationalinsurancedesstub.models.TaxYear)

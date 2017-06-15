@@ -27,8 +27,9 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import common.util.ResourceLoader._
 import org.scalatest.mockito.MockitoSugar
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController
-import uk.gov.hmrc.nationalinsurancedesstub.models.NationalInsuranceSummary
+import uk.gov.hmrc.nationalinsurancedesstub.models.{NationalInsuranceSummary, TaxYear}
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
 
 import scala.concurrent.Future
@@ -82,20 +83,20 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
 
     "return a created response and store the utr and tax year" in new Setup {
 
-      val nationalInsuranceSummary = NationalInsuranceSummary("2234567890", "2014")
+      val nationalInsuranceSummary = NationalInsuranceSummary("2234567890", "2015")
       given(underTest.repository.store(nationalInsuranceSummary)).willReturn(Future.successful(nationalInsuranceSummary))
 
-      val result = await(underTest.create("2234567890", "2014-15")(request))
+      val result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(request))
 
       status(result) shouldBe CREATED
-      verify(underTest.repository).store(NationalInsuranceSummary("2234567890", "2014"))
+      verify(underTest.repository).store(NationalInsuranceSummary("2234567890", "2015"))
     }
 
     "return an invalid server error when the repository fails" in new Setup {
 
       given(underTest.repository.store(any)).willReturn(Future.failed(new RuntimeException("expected test error")))
 
-      val result = await(underTest.create("2234567890", "2014-15")(request))
+      val result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(request))
 
       status(result) shouldBe INTERNAL_SERVER_ERROR
     }

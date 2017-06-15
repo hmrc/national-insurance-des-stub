@@ -17,20 +17,19 @@
 package it
 
 import it.helpers.BaseSpec
-import play.api.http.HeaderNames
 import play.api.http.Status.{CREATED, NOT_FOUND, OK}
 import uk.gov.hmrc.mongo.MongoConnector
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryMongoRepository
 
 import scala.concurrent.Await.result
-import scalaj.http.Http
 import scala.concurrent.ExecutionContext.Implicits.global
+import scalaj.http.Http
 
 class NationalInsuranceSummarySpec extends BaseSpec {
   feature("Fetch National Insurance summary") {
     scenario("No data is returned because UTR and tax year are not found") {
       When("I request a National Insurance summary for a given UTR and tax year")
-      val response = fetchNationalInsuranceSummary("2234567890", "2014-15")
+      val response = fetchNationalInsuranceSummary("2234567890", "2015")
 
       Then("The response should indicate that no data was found")
       response.code shouldBe NOT_FOUND
@@ -44,7 +43,7 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       primeResponse.code shouldBe CREATED
 
       And("I request a National Insurance summary for the same UTR and tax year")
-      val response = fetchNationalInsuranceSummary("2234567890", "2014-15")
+      val response = fetchNationalInsuranceSummary("2234567890", "2015")
 
       Then("The response should contain the National Insurance summary")
       response.code shouldBe OK
@@ -55,8 +54,8 @@ class NationalInsuranceSummarySpec extends BaseSpec {
   private def primeNationalInsuranceSummary(utr: String, taxYear: String) =
     postEndpoint(s"national-insurance-test-support/sa/$utr/annual-summary/$taxYear")
 
-  private def fetchNationalInsuranceSummary(utr: String, taxYear: String) =
-    getEndpoint(s"nics/utr/$utr/year/${taxYear.substring(0,4)}/summary")
+  private def fetchNationalInsuranceSummary(utr: String, taxYearEnd: String) =
+    getEndpoint(s"nics/utr/$utr/year/$taxYearEnd/summary")
 
   private def getEndpoint(endpoint: String) =
     Http(s"$serviceUrl/$endpoint").method("GET").asString
