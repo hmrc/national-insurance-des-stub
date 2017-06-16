@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationalinsurancedesstub.models
+package unit.services
 
-import play.api.libs.json.Json
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+class NationalInsuranceSummaryServiceSpec {
 
-object JsonFormatters {
-  implicit val formatObjectId = ReactiveMongoFormats.objectIdFormats
-  implicit val formatCreateSummaryRequest = Json.format[CreateSummaryRequest]
-  implicit val class1nicsFmt = Json.format[Class1NICs]
-  implicit val class2nicsFmt = Json.format[Class2NICs]
-  implicit val nicsFmt = Json.format[NICs]
-  implicit val formatNationalInsuranceSummary = Json.format[NationalInsuranceSummary]
 }
