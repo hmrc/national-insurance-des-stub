@@ -16,14 +16,6 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.models
 
-import play.api.libs.json.Json
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
-
-object JsonFormatters {
-  implicit val formatObjectId = ReactiveMongoFormats.objectIdFormats
-  implicit val formatCreateSummaryRequest = Json.format[CreateSummaryRequest]
-  implicit val class1nicsFmt = Json.format[Class1NICs]
-  implicit val class2nicsFmt = Json.format[Class2NICs]
-  implicit val nicsFmt = Json.format[NICs]
-  implicit val formatNationalInsuranceSummary = Json.format[NationalInsuranceSummary]
-}
+case class Class1NICs(totalNICableEarnings: Double)
+case class Class2NICs(totalDue: Double)
+case class NICs(class1: Class1NICs, class2: Class2NICs, maxNICsReached: Boolean)

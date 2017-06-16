@@ -16,43 +16,47 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.controllers
 
-import play.api.libs.json.Json
+import javax.inject.Inject
+
+import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.nationalinsurancedesstub.common.StubResource
-import uk.gov.hmrc.nationalinsurancedesstub.models.{NationalInsuranceSummary, TaxYear}
-import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
+import uk.gov.hmrc.nationalinsurancedesstub.models.JsonFormatters._
+import uk.gov.hmrc.nationalinsurancedesstub.models._
+import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, NationalInsuranceSummaryServiceImpl, ScenarioLoader, ScenarioLoaderImpl}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait NationalInsuranceSummaryController extends BaseController with StubResource {
-  val repository: NationalInsuranceSummaryRepository
+trait NationalInsuranceSummaryController extends BaseController {
+  val scenarioLoader: ScenarioLoader
+  val service: NationalInsuranceSummaryService
 
   def fetch(utr: String, taxEndYear: String) = Action.async { implicit request =>
-    val nationalInsuranceSummaryFuture = repository.fetch(utr, taxEndYear)
-    val documentFuture = findResource("/public/national-insurance-summary.json")
-
-    (for {
-      nationalInsuranceSummary <- nationalInsuranceSummaryFuture
-      document <- documentFuture
-    } yield nationalInsuranceSummary match {
-      case Some(_) => Ok(Json.parse(document))
+    service.fetch(utr, taxEndYear) map {
+      case Some(result) => Ok(Json.toJson(result.nics))
       case _ => NotFound
-    }) recover {
-      case _ => InternalServerError
-    }
-  }
-
-  def create(saUtr: SaUtr, taxYear: TaxYear) = Action.async { implicit request =>
-    repository.store(NationalInsuranceSummary(saUtr.utr, taxYear.endYr)) map {
-      _ => Created
     } recover {
       case _ => InternalServerError
     }
   }
+
+  def create(saUtr: SaUtr, taxYear: TaxYear) = Action.async(parse.json) { implicit request =>
+    withJsonBody[CreateSummaryRequest] { createSummaryRequest =>
+      val scenario = createSummaryRequest.scenario.getOrElse("HAPPY_PATH_1")
+
+      for {
+        nics <- scenarioLoader.loadScenario(scenario)
+        _ <- service.create(saUtr.utr, taxYear.endYr, nics)
+      } yield Created
+
+    } recover {
+      case _: InvalidScenarioException => BadRequest(ErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))
+      case _ => InternalServerError
+    }
+  }
 }
 
-class NationalInsuranceSummaryControllerImpl extends NationalInsuranceSummaryController {
-  override val repository = NationalInsuranceSummaryRepository()
-}
+class NationalInsuranceSummaryControllerImpl @Inject() (override val scenarioLoader: ScenarioLoaderImpl,
+                                                        override val service: NationalInsuranceSummaryServiceImpl)
+  extends NationalInsuranceSummaryController
