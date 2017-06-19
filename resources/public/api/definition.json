@@ -4,6 +4,7 @@
     "name": "National Insurance Test Support",
     "description": "Lets you set up data for the National Insurance API.",
     "context": "national-insurance-test-support",
+    "isTestSupport": true,
     "versions": [
       {
         "version": "1.0",

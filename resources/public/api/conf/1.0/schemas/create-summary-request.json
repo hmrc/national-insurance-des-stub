@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Create National Insurance summary test data request",
+  "type": "object",
+  "properties": {
+    "scenario": {
+      "description": "The scenario to create test data for",
+      "type": "string",
+      "oneOf": [
+        {
+          "enum": ["HAPPY_PATH_1"],
+          "description" : "Standard happy path test scenario (default)"
+        },
+        {
+          "enum": ["HAPPY_PATH_2"],
+          "description" : "Happy path test scenario with different values"
+        }
+      ]
+    }
+  }
+}

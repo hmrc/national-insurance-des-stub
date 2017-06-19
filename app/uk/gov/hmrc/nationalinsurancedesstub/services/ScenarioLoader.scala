@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationalinsurancedesstub.common
+package uk.gov.hmrc.nationalinsurancedesstub.services
 
-import java.io.{FileNotFoundException, InputStream}
-
-import play.api.Logger
-import play.api.mvc.Results
+import play.api.libs.json.Json
+import uk.gov.hmrc.nationalinsurancedesstub.models.JsonFormatters._
+import uk.gov.hmrc.nationalinsurancedesstub.models.{InvalidScenarioException, NICs}
 
 import scala.concurrent.Future
-import scala.io.Source
 
-trait StubResource extends Results {
+trait ScenarioLoader {
 
-  def findResource(path: String): Future[String] = {
-    val resource = getClass.getResourceAsStream(path)
+  private def pathForScenario(scenario: String) = {
+    s"/public/scenarios/$scenario.json"
+  }
+
+  def loadScenario(scenario: String): Future[NICs] = {
+    val resource = getClass.getResourceAsStream(pathForScenario(scenario))
     if (resource == null) {
-      Logger.warn(s"Could not find resource '$path'")
-      Future.failed(new FileNotFoundException(path))
+      Future.failed(new InvalidScenarioException(scenario))
     } else {
-      Future.successful(readStreamToString(resource))
+      Future.successful(Json.parse(resource).as[NICs])
     }
   }
-
-  private def readStreamToString(is: InputStream) = {
-    try Source.fromInputStream(is).mkString.toString
-    finally is.close()
-  }
-
 }
+
+class ScenarioLoaderImpl extends ScenarioLoader

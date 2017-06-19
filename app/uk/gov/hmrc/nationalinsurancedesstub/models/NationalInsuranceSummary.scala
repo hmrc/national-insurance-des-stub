@@ -16,4 +16,4 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.models
 
-case class NationalInsuranceSummary(utr: String, taxYear: String)
+case class NationalInsuranceSummary(utr: String, taxYear: String, nics: NICs)
