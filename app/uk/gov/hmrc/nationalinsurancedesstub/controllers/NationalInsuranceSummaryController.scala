@@ -32,7 +32,7 @@ trait NationalInsuranceSummaryController extends BaseController {
   val scenarioLoader: ScenarioLoader
   val service: NationalInsuranceSummaryService
 
-  def fetch(utr: String, taxEndYear: String) = Action.async { implicit request =>
+  def fetch(utr: String, taxEndYear: String) = Action.async {
     service.fetch(utr, taxEndYear) map {
       case Some(result) => Ok(Json.toJson(result.nics))
       case _ => NotFound

@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.services
 
-import java.io.InputStream
-
 import play.api.libs.json.Json
 import uk.gov.hmrc.nationalinsurancedesstub.models.JsonFormatters._
 import uk.gov.hmrc.nationalinsurancedesstub.models.{InvalidScenarioException, NICs}
 
 import scala.concurrent.Future
-import scala.io.Source
 
 trait ScenarioLoader {
 
   private def pathForScenario(scenario: String) = {
-    s"/public/scenarios/${scenario}.json"
+    s"/public/scenarios/$scenario.json"
   }
 
   def loadScenario(scenario: String): Future[NICs] = {
@@ -36,14 +33,8 @@ trait ScenarioLoader {
     if (resource == null) {
       Future.failed(new InvalidScenarioException(scenario))
     } else {
-      val json = readStreamToString(resource)
-      Future.successful(Json.parse(json).as[NICs])
+      Future.successful(Json.parse(resource).as[NICs])
     }
-  }
-
-  private def readStreamToString(is: InputStream) = {
-    try Source.fromInputStream(is).mkString.toString
-    finally is.close()
   }
 }
 
