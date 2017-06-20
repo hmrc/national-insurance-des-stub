@@ -23,7 +23,7 @@ instead of to a real DES when they are deployed to the External Test environment
 
 ## Running the tests
 ```
-./run_all_test.sh
+./run_all_tests.sh
 ```
 
 ## Running the service locally
