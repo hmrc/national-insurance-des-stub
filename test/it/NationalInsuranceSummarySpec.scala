@@ -97,7 +97,7 @@ class NationalInsuranceSummarySpec extends BaseSpec {
   }
 
   private def primeNationalInsuranceSummary(utr: String, taxYear: String, payload: String) =
-    postEndpoint(s"national-insurance-test-support/sa/$utr/annual-summary/$taxYear", payload)
+    postEndpoint(s"sa/$utr/annual-summary/$taxYear", payload)
 
   private def fetchNationalInsuranceSummary(utr: String, taxYearEnd: String) =
     getEndpoint(s"nics/utr/$utr/year/$taxYearEnd/summary")
