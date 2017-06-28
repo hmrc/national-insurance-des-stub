@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationalinsurancedesstub.services
+package uk.gov.hmrc.nationalinsurancedesstub
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.nationalinsurancedesstub.models._
+import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
-import scala.concurrent.Future
+package object models {
+  implicit val formatObjectId = ReactiveMongoFormats.objectIdFormats
+  implicit val formatCreateSummaryRequest = Json.format[CreateSummaryRequest]
+  implicit val class1nicsFmt = Json.format[Class1NICs]
+  implicit val class2nicsFmt = Json.format[Class2NICs]
+  implicit val nicsFmt = Json.format[NICs]
+  implicit val formatNationalInsuranceSummary = Json.format[NationalInsuranceSummary]
 
-trait ScenarioLoader {
+  implicit val apiAccessFmt = Json.format[APIAccess]
 
-  private def pathForScenario(scenario: String) = {
-    s"/public/scenarios/$scenario.json"
-  }
-
-  def loadScenario(scenario: String): Future[NICs] = {
-    val resource = getClass.getResourceAsStream(pathForScenario(scenario))
-    if (resource == null) {
-      Future.failed(new InvalidScenarioException(scenario))
-    } else {
-      Future.successful(Json.parse(resource).as[NICs])
-    }
-  }
 }
-
-class ScenarioLoaderImpl extends ScenarioLoader

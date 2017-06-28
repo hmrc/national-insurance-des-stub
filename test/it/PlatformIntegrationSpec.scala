@@ -30,6 +30,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
 import uk.gov.hmrc.api.domain.Registration
+import uk.gov.hmrc.nationalinsurancedesstub.config.AppContext
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.test.UnitSpec
@@ -70,7 +71,7 @@ class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutur
   }
 
   trait Setup extends MicroserviceFilterSupport {
-    val documentationController = new DocumentationController(LazyHttpErrorHandler) {}
+    val documentationController = new DocumentationController(LazyHttpErrorHandler, AppContext) {}
     val request = FakeRequest()
   }
 
