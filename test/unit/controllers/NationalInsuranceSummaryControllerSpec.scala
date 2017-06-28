@@ -16,7 +16,6 @@
 
 package unit.controllers
 
-import common.util.ResourceLoader._
 import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.verify
@@ -26,7 +25,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController
-import uk.gov.hmrc.nationalinsurancedesstub.models.JsonFormatters._
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
