@@ -1,3 +1,6 @@
+@import uk.gov.hmrc.nationalinsurancedesstub.models.APIAccess
+@import play.api.libs.json.Json
+@(access: String => APIAccess)
 {
   "scopes":[],
   "api": {
@@ -8,7 +11,8 @@
     "versions": [
       {
         "version": "1.0",
-        "status": "PROTOTYPED"
+        "status": "PROTOTYPED",
+        "access": @Json.toJson(access("""1.0"""))
       }
     ]
   }
