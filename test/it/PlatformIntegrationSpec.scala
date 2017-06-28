@@ -71,7 +71,7 @@ class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutur
   }
 
   trait Setup extends MicroserviceFilterSupport {
-    val documentationController = new DocumentationController(LazyHttpErrorHandler, AppContext) {}
+    val documentationController = new DocumentationController(LazyHttpErrorHandler, new AppContext()) {}
     val request = FakeRequest()
   }
 
