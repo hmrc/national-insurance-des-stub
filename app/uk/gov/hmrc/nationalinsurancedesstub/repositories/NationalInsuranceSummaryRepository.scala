@@ -20,8 +20,7 @@ import play.modules.reactivemongo.MongoDbConnection
 import reactivemongo.api.DB
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.mongo.{ReactiveRepository, Repository}
-import uk.gov.hmrc.nationalinsurancedesstub.models.{JsonFormatters, NationalInsuranceSummary}
-
+import uk.gov.hmrc.nationalinsurancedesstub.models._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -38,11 +37,15 @@ object NationalInsuranceSummaryRepository extends MongoDbConnection {
 
 class NationalInsuranceSummaryMongoRepository(implicit mongo: () => DB)
   extends ReactiveRepository[NationalInsuranceSummary, BSONObjectID]("national-insurance-summary", mongo,
-    JsonFormatters.formatNationalInsuranceSummary, JsonFormatters.formatObjectId)
+    formatNationalInsuranceSummary, formatObjectId)
   with NationalInsuranceSummaryRepository {
 
   override def store[T <: NationalInsuranceSummary](nationalInsuranceSummary: T): Future[T] = {
-    insert(nationalInsuranceSummary) map {_ => nationalInsuranceSummary}
+    remove("utr" -> nationalInsuranceSummary.utr, "taxYear" -> nationalInsuranceSummary.taxYear) map {
+      _ => insert(nationalInsuranceSummary)
+    } map {
+      _ => nationalInsuranceSummary
+    }
   }
 
   def fetch(utr: String, taxYear: String): Future[Option[NationalInsuranceSummary]] = {

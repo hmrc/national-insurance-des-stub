@@ -83,6 +83,30 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       Json.parse(response.body) shouldBe Json.parse(expected)
     }
 
+    scenario("National Insurance summary can be re-primed with a different scenario") {
+      When("I prime a National Insurance summary for a given UTR and tax year")
+      val initialPrimeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", """{ "scenario": "HAPPY_PATH_1" }""")
+
+      Then("The response should indicate that the summary has been created")
+      initialPrimeResponse.code shouldBe CREATED
+
+      And("I re-prime the National Insurance summary for the same UTR and tax year with a different scenario")
+      val primeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", """{ "scenario": "HAPPY_PATH_2" }""")
+
+      Then("The response should indicate that the summary has been created")
+      primeResponse.code shouldBe CREATED
+
+      And("I request a National Insurance summary for the same UTR and tax year")
+      val response = fetchNationalInsuranceSummary("2234567890", "2015")
+
+      Then("The response code should be OK")
+      response.code shouldBe OK
+
+      And("The response should contain the National Insurance summary for the changed scenario")
+      val expected = loadResource("/public/scenarios/HAPPY_PATH_2.json")
+      Json.parse(response.body) shouldBe Json.parse(expected)
+    }
+
     scenario("National Insurance summary cannot be primed with an invalid scenario") {
       When("I prime a National Insurance summary with an invalid scenario")
       val primeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", """{ "scenario": "NON_EXISTENT" }""")

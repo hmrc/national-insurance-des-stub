@@ -16,14 +16,12 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.models
 
-import play.api.libs.json.Json
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import play.api.Configuration
 
-object JsonFormatters {
-  implicit val formatObjectId = ReactiveMongoFormats.objectIdFormats
-  implicit val formatCreateSummaryRequest = Json.format[CreateSummaryRequest]
-  implicit val class1nicsFmt = Json.format[Class1NICs]
-  implicit val class2nicsFmt = Json.format[Class2NICs]
-  implicit val nicsFmt = Json.format[NICs]
-  implicit val formatNationalInsuranceSummary = Json.format[NationalInsuranceSummary]
+case class APIAccess(`type`: String, whitelistedApplicationIds: Option[Seq[String]])
+
+object APIAccess {
+  def build(config: Option[Configuration])(version: String): APIAccess = APIAccess(
+    `type` = config.flatMap(_.getString(s"version-$version.type")).getOrElse("PRIVATE"),
+    whitelistedApplicationIds = config.flatMap((_.getStringSeq(s"version-$version.whitelistedApplicationIds"))).orElse(Some(Seq.empty)))
 }
