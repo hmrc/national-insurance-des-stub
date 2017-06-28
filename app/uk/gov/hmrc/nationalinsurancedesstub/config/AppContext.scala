@@ -16,15 +16,10 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.config
 
-import play.api.Configuration
 import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
 
-trait AppContext extends ServicesConfig {
-  val configuration: Configuration
-  lazy val access = configuration.getConfig(s"api.access")
-}
-
-object AppContext extends AppContext {
+class AppContext extends ServicesConfig {
   val configuration = current.configuration
+  lazy val access = configuration.getConfig(s"api.access")
 }
