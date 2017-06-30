@@ -132,6 +132,7 @@ class NationalInsuranceSummarySpec extends BaseSpec {
   private def postEndpoint(endpoint: String, payload: String) =
     Http(s"$serviceUrl/$endpoint")
       .header(HeaderNames.CONTENT_TYPE, "application/json")
+      .header(HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
       .method("POST")
       .postData(payload)
       .asString
