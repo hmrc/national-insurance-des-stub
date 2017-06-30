@@ -20,6 +20,7 @@ import javax.inject.Inject
 
 import play.api.libs.json._
 import play.api.mvc._
+import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, NationalInsuranceSummaryServiceImpl, ScenarioLoader, ScenarioLoaderImpl}
@@ -27,7 +28,7 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait NationalInsuranceSummaryController extends BaseController {
+trait NationalInsuranceSummaryController extends BaseController with HeaderValidator {
   val scenarioLoader: ScenarioLoader
   val service: NationalInsuranceSummaryService
 
@@ -40,7 +41,7 @@ trait NationalInsuranceSummaryController extends BaseController {
     }
   }
 
-  def create(saUtr: SaUtr, taxYear: TaxYear) = Action.async(parse.json) { implicit request =>
+  def create(saUtr: SaUtr, taxYear: TaxYear) = validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
     withJsonBody[CreateSummaryRequest] { createSummaryRequest =>
       val scenario = createSummaryRequest.scenario.getOrElse("HAPPY_PATH_1")
 
