@@ -20,6 +20,7 @@ import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.verify
 import org.scalatest.mockito.MockitoSugar
+import play.api.http.HeaderNames
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
@@ -46,14 +47,16 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
       override val service = mock[NationalInsuranceSummaryService]
     }
 
+    def request(jsonPayload: JsValue) = {
+      FakeRequest().withHeaders(HeaderNames.ACCEPT -> "application/vnd.hmrc.1.0+json").withBody[JsValue](jsonPayload)
+    }
+
     def createSummaryRequest(scenario: String) = {
-      val jsonPayload = Json.parse(s"""{ "scenario": "$scenario" }""")
-      FakeRequest().withBody[JsValue](jsonPayload)
+      request(Json.parse(s"""{ "scenario": "$scenario" }"""))
     }
 
     def emptyRequest = {
-      val jsonPayload = Json.parse("{}")
-      FakeRequest().withBody[JsValue](jsonPayload)
+      request(Json.parse("{}"))
     }
 
     val nics = NICs(Class1NICs(10), Class2NICs(20), false)
