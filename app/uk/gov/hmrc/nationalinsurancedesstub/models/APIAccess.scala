@@ -23,5 +23,5 @@ case class APIAccess(`type`: String, whitelistedApplicationIds: Option[Seq[Strin
 object APIAccess {
   def build(config: Option[Configuration])(version: String): APIAccess = APIAccess(
     `type` = config.flatMap(_.getString(s"version-$version.type")).getOrElse("PRIVATE"),
-    whitelistedApplicationIds = config.flatMap((_.getStringSeq(s"version-$version.whitelistedApplicationIds"))).orElse(Some(Seq.empty)))
+    whitelistedApplicationIds = config.foldLeft[Option[Seq[String]]](None){(_, conf) => conf.getStringSeq(s"version-$version.whitelistedApplicationIds")})
 }
