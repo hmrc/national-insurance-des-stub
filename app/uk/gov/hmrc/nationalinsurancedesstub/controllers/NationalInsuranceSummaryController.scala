@@ -48,7 +48,7 @@ trait NationalInsuranceSummaryController extends BaseController with HeaderValid
       for {
         nics <- scenarioLoader.loadScenario(scenario)
         _ <- service.create(saUtr.utr, taxYear.endYr, nics)
-      } yield Created.as(JSON)
+      } yield Created(Json.toJson(nics))
 
     } recover {
       case _: InvalidScenarioException => BadRequest(ErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))

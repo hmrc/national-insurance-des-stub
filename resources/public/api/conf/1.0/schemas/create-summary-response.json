@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Create National Insurance summary test data response",
+  "type": "object",
+  "properties": {
+    "class1": {
+      "type": "object",
+      "properties": {
+        "totalNICableEarnings": {
+          "description": "The total class one earnings eligible for National Insurance.",
+          "type": "number",
+          "example": "10"
+        }
+      }
+    },
+    "class2": {
+      "type": "object",
+      "properties": {
+        "totalDue": {
+          "description": "The total class two earnings eligible for National Insurance.",
+          "type": "number",
+          "example": "10"
+        }
+      }
+    },
+    "maxNICsReached": {
+      "description": "Has the maximum National Insurance Contribution been reached.",
+      "type": "boolean",
+      "example": "false"
+    }
+  }
+}

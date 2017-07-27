@@ -1,0 +1,9 @@
+{
+  "class1": {
+    "totalNICableEarnings": 10
+  },
+  "class2": {
+    "totalDue": 20
+  },
+  "maxNICsReached": false
+}
