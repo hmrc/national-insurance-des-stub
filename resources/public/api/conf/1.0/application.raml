@@ -47,3 +47,13 @@ uses:
                 example: !include examples/create-summary-request.json
             responses:
               201:
+                body:
+                  application/json:
+                    examples:
+                      example-1:
+                        description: Example response for scenario HAPPY_PATH_1
+                        value: !include examples/create-summary-response-1.json
+                      example-2:
+                        description: Example response for scenario HAPPY_PATH_2
+                        value: !include examples/create-summary-response-2.json
+
