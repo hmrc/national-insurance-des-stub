@@ -7,26 +7,29 @@
       "type": "object",
       "properties": {
         "totalNICableEarnings": {
-          "description": "The total class one earnings eligible for National Insurance.",
+          "description": "Total Class 1 earnings subject to National Insurance contributions between the Primary Threshold and the Upper Earnings Limit",
           "type": "number",
           "example": "10"
         }
-      }
+      },
+      "required": ["totalNICableEarnings"]
     },
     "class2": {
       "type": "object",
       "properties": {
         "totalDue": {
-          "description": "The total class two earnings eligible for National Insurance.",
+          "description": "Total Class 2 National Insurance contributions due",
           "type": "number",
           "example": "10"
         }
-      }
+      },
+      "required": ["totalDue"]
     },
     "maxNICsReached": {
-      "description": "Has the maximum National Insurance Contribution been reached.",
+      "description": "A flag indicating whether the maximum National Insurance contributions has been reached",
       "type": "boolean",
       "example": "false"
     }
-  }
+  },
+  "required": ["class1", "class2", "maxNICsReached"]
 }
