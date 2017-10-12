@@ -16,10 +16,15 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.config
 
+import uk.gov.hmrc.http.{HttpDelete, HttpGet, HttpPost, HttpPut}
 import uk.gov.hmrc.play.config.AppName
-import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
+import uk.gov.hmrc.http.hooks.HttpHooks
 
-object WSHttp extends WSGet with WSPut with WSPost with WSDelete with WSPatch with AppName {
-  override val hooks: Seq[HttpHook] = NoneRequired
+trait Hooks extends HttpHooks {
+  override val hooks = NoneRequired
 }
+
+trait WSHttp extends HttpGet with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete with WSDelete with Hooks with AppName
+
+object WSHttp extends WSHttp

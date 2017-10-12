@@ -28,12 +28,12 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
 
 
 class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar with WithFakeApplication {

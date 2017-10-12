@@ -32,8 +32,8 @@ import play.api.{Application, Mode}
 import uk.gov.hmrc.api.domain.Registration
 import uk.gov.hmrc.nationalinsurancedesstub.config.AppContext
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
 
 /**
   * Testcase to verify the capability of integration with the API platform.
