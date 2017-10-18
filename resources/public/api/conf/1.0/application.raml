@@ -39,7 +39,7 @@ uses:
           post:
             displayName: Create National Insurance summary test data
             description: Lets you create National Insurance contributions test data
-            is: [headers.acceptHeader]
+            is: [headers.acceptHeader, headers.contentHeader]
             securedBy: [ sec.x-application ]
             body:
               application/json:
@@ -57,4 +57,3 @@ uses:
                         example-2:
                           description: Example response for scenario HAPPY_PATH_2
                           value: !include examples/create-summary-response-2.json
-
