@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.controllers
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.models._
-import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, NationalInsuranceSummaryServiceImpl, ScenarioLoader, ScenarioLoaderImpl}
+import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait NationalInsuranceSummaryController extends BaseController with HeaderValidator {
-  val scenarioLoader: ScenarioLoader
-  val service: NationalInsuranceSummaryService
+@Singleton
+class NationalInsuranceSummaryController @Inject()(val scenarioLoader: ScenarioLoader, val service: NationalInsuranceSummaryService)
+  extends BaseController with HeaderValidator {
 
   def fetch(utr: String, taxEndYear: String) = Action.async {
     service.fetch(utr, taxEndYear) map {
@@ -56,7 +56,3 @@ trait NationalInsuranceSummaryController extends BaseController with HeaderValid
     }
   }
 }
-
-class NationalInsuranceSummaryControllerImpl @Inject() (override val scenarioLoader: ScenarioLoaderImpl,
-                                                        override val service: NationalInsuranceSummaryServiceImpl)
-  extends NationalInsuranceSummaryController

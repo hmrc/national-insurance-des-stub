@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.config
 
+import uk.gov.hmrc.http.hooks.HttpHooks
 import uk.gov.hmrc.http.{HttpDelete, HttpGet, HttpPost, HttpPut}
 import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.http.ws._
-import uk.gov.hmrc.http.hooks.HttpHooks
 
 trait Hooks extends HttpHooks {
   override val hooks = NoneRequired
