@@ -1,6 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
-
-sbt test
-sbt it:test
+sbt clean compile coverage test it:test coverageOff coverageReport

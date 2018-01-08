@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,15 @@ import org.scalatest._
 import org.scalatestplus.play.OneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.modules.reactivemongo.ReactiveMongoComponent
+import uk.gov.hmrc.mongo.MongoSpecSupport
 
 import scala.concurrent.duration.Duration
 
-trait BaseSpec extends FeatureSpec with BeforeAndAfterAll with BeforeAndAfterEach with Matchers with OneServerPerSuite with GivenWhenThen {
+trait BaseSpec extends FeatureSpec with MongoSpecSupport with BeforeAndAfterAll with BeforeAndAfterEach with Matchers
+  with OneServerPerSuite with GivenWhenThen {
+
   override lazy val port = 9000
-  lazy val mongoUri = "mongodb://localhost:27017/national-insurance-des-stub"
 
   implicit override lazy val app: Application = GuiceApplicationBuilder().configure(
     "auditing.enabled" -> false,
@@ -35,6 +38,8 @@ trait BaseSpec extends FeatureSpec with BeforeAndAfterAll with BeforeAndAfterEac
     "mongodb.uri" -> mongoUri,
     "run.mode" -> "It"
   ).build()
+
+  val reactiveMongoComponent = new ReactiveMongoComponent { override val mongoConnector = mongoConnectorForTest }
 
   val timeout = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://localhost:$port"

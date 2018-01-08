@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.services
 
+import javax.inject.Singleton
+
 import play.api.libs.json.Json
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 
 import scala.concurrent.Future
 
-trait ScenarioLoader {
+@Singleton
+class ScenarioLoader {
 
   private def pathForScenario(scenario: String) = {
     s"/public/scenarios/$scenario.json"
@@ -36,5 +39,3 @@ trait ScenarioLoader {
     }
   }
 }
-
-class ScenarioLoaderImpl extends ScenarioLoader

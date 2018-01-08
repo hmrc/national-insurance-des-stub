@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,22 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.repositories
 
-import play.modules.reactivemongo.MongoDbConnection
-import reactivemongo.api.DB
+import javax.inject.{Inject, Singleton}
+
+import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.bson.BSONObjectID
-import uk.gov.hmrc.mongo.{ReactiveRepository, Repository}
+import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.nationalinsurancedesstub.models._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+@Singleton
+class NationalInsuranceSummaryRepository @Inject()(mongo: ReactiveMongoComponent)
+  extends ReactiveRepository[NationalInsuranceSummary, BSONObjectID]("national-insurance-summary", mongo.mongoConnector.db,
+    formatNationalInsuranceSummary, formatObjectId) {
 
-trait NationalInsuranceSummaryRepository extends Repository[NationalInsuranceSummary, BSONObjectID] {
-  def store[T <: NationalInsuranceSummary](nationalInsuranceSummary: T): Future[T]
-  def fetch(utr: String, taxYear: String): Future[Option[NationalInsuranceSummary]]
-}
-
-object NationalInsuranceSummaryRepository extends MongoDbConnection {
-  private lazy val repository = new NationalInsuranceSummaryMongoRepository
-  def apply(): NationalInsuranceSummaryRepository = repository
-}
-
-class NationalInsuranceSummaryMongoRepository(implicit mongo: () => DB)
-  extends ReactiveRepository[NationalInsuranceSummary, BSONObjectID]("national-insurance-summary", mongo,
-    formatNationalInsuranceSummary, formatObjectId)
-  with NationalInsuranceSummaryRepository {
-
-  override def store[T <: NationalInsuranceSummary](nationalInsuranceSummary: T): Future[T] = {
+  def store[T <: NationalInsuranceSummary](nationalInsuranceSummary: T): Future[T] = {
     remove("utr" -> nationalInsuranceSummary.utr, "taxYear" -> nationalInsuranceSummary.taxYear) map {
       _ => insert(nationalInsuranceSummary)
     } map {
