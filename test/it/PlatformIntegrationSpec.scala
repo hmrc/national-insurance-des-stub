@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ import play.api.{Application, Mode}
 import uk.gov.hmrc.api.domain.Registration
 import uk.gov.hmrc.nationalinsurancedesstub.config.AppContext
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
-import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
+import uk.gov.hmrc.play.test.UnitSpec
 
 /**
   * Testcase to verify the capability of integration with the API platform.
