@@ -16,16 +16,16 @@ lazy val appDependencies: Seq[ModuleID] = compile ++ test
 
 lazy val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "microservice-bootstrap" % "6.11.0",
+  "uk.gov.hmrc" %% "microservice-bootstrap" % "6.15.0",
   "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
   "uk.gov.hmrc" %% "play-reactivemongo" % "5.2.0",
-  "uk.gov.hmrc" %% "domain" % "5.0.0"
+  "uk.gov.hmrc" %% "domain" % "5.1.0"
 )
 
 lazy val scope: String = "test,it"
 
 def test = Seq(
-  "uk.gov.hmrc" %% "hmrctest" % "2.4.0" % scope,
+  "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
   "uk.gov.hmrc" %% "reactivemongo-test" % "3.0.0" % scope,
   "org.scalatest" %% "scalatest" % "3.0.1" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
