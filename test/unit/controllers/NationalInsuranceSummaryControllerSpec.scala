@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,15 @@ import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.SaUtr
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
+import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
 
 
 class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar with WithFakeApplication {
@@ -42,10 +42,7 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
     val request = FakeRequest().withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
     implicit val headerCarrier = HeaderCarrier()
 
-    val underTest = new NationalInsuranceSummaryController {
-      override val scenarioLoader = mock[ScenarioLoader]
-      override val service = mock[NationalInsuranceSummaryService]
-    }
+    val underTest = new NationalInsuranceSummaryController(mock[ScenarioLoader], mock[NationalInsuranceSummaryService])
 
     def request(jsonPayload: JsValue) = {
       FakeRequest().withHeaders(HeaderNames.ACCEPT -> "application/vnd.hmrc.1.0+json").withBody[JsValue](jsonPayload)

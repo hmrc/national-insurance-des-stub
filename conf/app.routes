@@ -2,12 +2,12 @@
 
 # DES endpoints
 
-GET   /nics/utr/:utr/year/:taxYear/summary                               @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryControllerImpl.fetch(utr, taxYear)
+GET   /nics/utr/:utr/year/:taxYear/summary      @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController.fetch(utr, taxYear)
 
 
 # Test support API endpoints
 
-GET   /api/definition              @uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.definition()
-GET   /api/conf/:version/*file     @uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.raml(version, file)
+GET   /api/definition                           @uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.definition()
+GET   /api/conf/:version/*file                  @uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.raml(version, file)
 
-POST  /sa/:utr/annual-summary/:taxYear   @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryControllerImpl.create(utr: uk.gov.hmrc.domain.SaUtr, taxYear: uk.gov.hmrc.nationalinsurancedesstub.models.TaxYear)
+POST  /sa/:utr/annual-summary/:taxYear          @uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController.create(utr: uk.gov.hmrc.domain.SaUtr, taxYear: uk.gov.hmrc.nationalinsurancedesstub.models.TaxYear)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ package it
 import common.util.ResourceLoader._
 import it.helpers.BaseSpec
 import play.api.http.HeaderNames
-import play.api.http.Status.{CREATED, NOT_FOUND, OK, BAD_REQUEST}
+import play.api.http.Status.{BAD_REQUEST, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.Json
-import uk.gov.hmrc.mongo.MongoConnector
-import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryMongoRepository
+import uk.gov.hmrc.mongo.MongoSpecSupport
+import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
 
 import scala.concurrent.Await.result
 import scala.concurrent.ExecutionContext.Implicits.global
 import scalaj.http.Http
 
-class NationalInsuranceSummarySpec extends BaseSpec {
+class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
   feature("Fetch National Insurance summary") {
     scenario("No data is returned because UTR and tax year are not found") {
       When("I request a National Insurance summary for a given UTR and tax year")
@@ -138,12 +138,8 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       .asString
 
   override protected def beforeEach(): Unit = {
-    result(mongoRepository.drop, timeout)
-    result(mongoRepository.ensureIndexes, timeout)
-  }
-
-  def mongoRepository = {
-    implicit val mongo = MongoConnector(mongoUri).db
-    new NationalInsuranceSummaryMongoRepository()
+    val repository = app.injector.instanceOf[NationalInsuranceSummaryRepository]
+    result(repository.drop, timeout)
+    result(repository.ensureIndexes, timeout)
   }
 }
