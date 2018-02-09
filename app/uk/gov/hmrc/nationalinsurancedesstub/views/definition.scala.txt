@@ -11,7 +11,8 @@
     "versions": [
       {
         "version": "1.0",
-        "status": "PROTOTYPED",
+        "status": "BETA",
+        "endpointsEnabled": true,
         "access": @Json.toJson(access("""1.0"""))
       }
     ]
