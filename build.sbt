@@ -16,10 +16,10 @@ lazy val appDependencies: Seq[ModuleID] = compile ++ test
 
 lazy val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "microservice-bootstrap" % "6.18.0",
+  "uk.gov.hmrc" %% "microservice-bootstrap" % "8.2.0",
   "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
-  "uk.gov.hmrc" %% "play-reactivemongo" % "5.2.0",
-  "uk.gov.hmrc" %% "domain" % "5.1.0"
+  "uk.gov.hmrc" %% "play-reactivemongo" % "6.2.0",
+  "uk.gov.hmrc" %% "domain" % "5.2.0"
 )
 
 lazy val scope: String = "test,it"
@@ -43,7 +43,7 @@ def unitFilter(name: String): Boolean = name startsWith "unit"
 def itTestFilter(name: String): Boolean = name startsWith "it"
 
 lazy val microservice = (project in file("."))
-  .enablePlugins(Seq(_root_.play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins: _*)
+  .enablePlugins(Seq(_root_.play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory) ++ plugins: _*)
   .settings(playSettings: _*)
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
@@ -54,7 +54,8 @@ lazy val microservice = (project in file("."))
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    routesGenerator := StaticRoutesGenerator
+    routesGenerator := StaticRoutesGenerator,
+    majorVersion := 0
   )
   .settings(routesImport += "uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders._")
   .settings(
