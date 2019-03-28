@@ -1,23 +1,19 @@
+import _root_.play.sbt.routes.RoutesKeys.{routesGenerator, routesImport}
 import play.core.PlayVersion
-import play.sbt.PlayImport._
-import sbt.Tests.{SubProcess, Group}
-import play.sbt.routes.RoutesKeys.routesImport
 import play.routes.compiler.StaticRoutesGenerator
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
-import uk.gov.hmrc._
-import DefaultBuildSettings._
+import sbt.Tests.{Group, SubProcess}
+import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.versioning.SbtGitVersioning
-import _root_.play.sbt.routes.RoutesKeys.routesGenerator
 
 lazy val appName = "national-insurance-des-stub"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test
 
 lazy val compile = Seq(
-  ws,
-  "uk.gov.hmrc" %% "microservice-bootstrap" % "8.2.0",
-  "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
+  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.9.0",
+  "uk.gov.hmrc" %% "play-hmrc-api" % "3.4.0-play-25",
   "uk.gov.hmrc" %% "simple-reactivemongo" % "7.16.0-play-25",
   "uk.gov.hmrc" %% "domain" % "5.6.0-play-25"
 )

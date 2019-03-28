@@ -16,15 +16,26 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.config
 
+import com.google.inject.AbstractModule
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.config.ServicesConfig
+import play.api.Logger
+import uk.gov.hmrc.nationalinsurancedesstub.connectors.ServiceLocatorConnector
+
+class ServiceLocatorRegistrationModule extends AbstractModule {
+  override def configure(): Unit = {
+    bind(classOf[ServiceLocatorRegistration]).asEagerSingleton()
+  }
+}
 
 @Singleton
-class AppContext @Inject()(override val runModeConfiguration: Configuration, environment: Environment) extends ServicesConfig {
+class ServiceLocatorRegistration @Inject()(config: ServiceLocatorRegistrationConfig, connector: ServiceLocatorConnector) {
 
-  override protected def mode = environment.mode
-
-  lazy val access = runModeConfiguration.getConfig(s"api.access")
-
+  if (config.registrationEnabled) {
+    Logger.info(s"Service Locator registration is enabled")
+    connector.register()
+  } else {
+    Logger.info(s"Service Locator registration is disabled")
+  }
 }
+
+case class ServiceLocatorRegistrationConfig(registrationEnabled: Boolean)

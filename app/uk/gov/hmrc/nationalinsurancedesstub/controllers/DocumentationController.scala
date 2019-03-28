@@ -24,7 +24,7 @@ import play.api.mvc.Action
 import uk.gov.hmrc.nationalinsurancedesstub.config.AppContext
 import uk.gov.hmrc.nationalinsurancedesstub.models.APIAccess
 import uk.gov.hmrc.nationalinsurancedesstub.views.txt
-import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
 @Singleton
 class DocumentationController @Inject()(httpErrorHandler: HttpErrorHandler, appContext: AppContext)
