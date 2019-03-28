@@ -29,7 +29,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
-import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,9 +37,10 @@ import scala.concurrent.Future
 
 class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar with WithFakeApplication {
 
-  trait Setup extends MicroserviceFilterSupport {
+  trait Setup {
     val request = FakeRequest().withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
     implicit val headerCarrier = HeaderCarrier()
+    implicit val mat = fakeApplication.materializer
 
     val underTest = new NationalInsuranceSummaryController(mock[ScenarioLoader], mock[NationalInsuranceSummaryService])
 
@@ -56,14 +56,14 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
       request(Json.parse("{}"))
     }
 
-    val nics = NICs(Class1NICs(10), Class2NICs(20), false)
+    val nics = NICs(Class1NICs(10), Class2NICs(20), maxNICsReached = false)
   }
 
   "fetch" should {
 
     "return the happy path response when called with a utr and tax year that are found" in new Setup {
 
-     given(underTest.service.fetch(anyString, anyString)).willReturn(Future(Some(NationalInsuranceSummary("2234567890", "2014", nics))))
+      given(underTest.service.fetch(anyString, anyString)).willReturn(Future(Some(NationalInsuranceSummary("2234567890", "2014", nics))))
 
       val result = await(underTest.fetch("2234567890", "2014")(request))
 

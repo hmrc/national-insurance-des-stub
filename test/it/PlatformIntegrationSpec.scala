@@ -24,15 +24,13 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, TestData}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.http.LazyHttpErrorHandler
+import play.api.http.Status.NO_CONTENT
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
 import uk.gov.hmrc.api.domain.Registration
-import uk.gov.hmrc.nationalinsurancedesstub.config.AppContext
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
-import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**
@@ -43,7 +41,8 @@ import uk.gov.hmrc.play.test.UnitSpec
   * - application url
   *
   * 2a, To expose API's to Third Party Developers, the service needs to make the API definition available under api/definition GET endpoint
-  * 2b, The endpoints need to be defined in an application.raml file for all versions  For all of the endpoints defined documentation will be provided and be available under api/documentation/[version]/[endpoint name] GET endpoint
+  * 2b, The endpoints need to be defined in an application.raml file for all versions  For all of the endpoints defined documentation will be provided and be
+  * available under api/documentation/[version]/[endpoint name] GET endpoint
   * Example: api/documentation/1.0/Fetch-Some-Data
   */
 class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach with GuiceOneAppPerTest {
@@ -65,11 +64,11 @@ class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutur
   override def beforeEach() {
     wireMockServer.start()
     WireMock.configureFor(stubHost, stubPort)
-    stubFor(post(urlMatching("/registration")).willReturn(aResponse().withStatus(204)))
+    stubFor(post(urlMatching("/registration")).willReturn(aResponse().withStatus(NO_CONTENT)))
   }
 
-  trait Setup extends MicroserviceFilterSupport {
-    val documentationController = new DocumentationController(LazyHttpErrorHandler, new AppContext()) {}
+  trait Setup {
+    val documentationController = app.injector.instanceOf[DocumentationController]
     val request = FakeRequest()
   }
 
@@ -95,7 +94,7 @@ class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutur
     }
   }
 
-  override protected def afterEach() = {
+  override protected def afterEach(): Unit = {
     wireMockServer.stop()
     wireMockServer.resetMappings()
   }

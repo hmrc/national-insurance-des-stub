@@ -1,32 +1,28 @@
+import _root_.play.sbt.routes.RoutesKeys.{routesGenerator, routesImport}
 import play.core.PlayVersion
-import play.sbt.PlayImport._
-import sbt.Tests.{SubProcess, Group}
-import play.sbt.routes.RoutesKeys.routesImport
 import play.routes.compiler.StaticRoutesGenerator
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
-import uk.gov.hmrc._
-import DefaultBuildSettings._
+import sbt.Tests.{Group, SubProcess}
+import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.versioning.SbtGitVersioning
-import _root_.play.sbt.routes.RoutesKeys.routesGenerator
 
 lazy val appName = "national-insurance-des-stub"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test
 
 lazy val compile = Seq(
-  ws,
-  "uk.gov.hmrc" %% "microservice-bootstrap" % "8.2.0",
-  "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
-  "uk.gov.hmrc" %% "play-reactivemongo" % "6.2.0",
-  "uk.gov.hmrc" %% "domain" % "5.2.0"
+  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.9.0",
+  "uk.gov.hmrc" %% "play-hmrc-api" % "3.4.0-play-25",
+  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.16.0-play-25",
+  "uk.gov.hmrc" %% "domain" % "5.6.0-play-25"
 )
 
 lazy val scope: String = "test,it"
 
 def test = Seq(
-  "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
-  "uk.gov.hmrc" %% "reactivemongo-test" % "3.1.0" % scope,
+  "uk.gov.hmrc" %% "hmrctest" % "3.6.0-play-25" % scope,
+  "uk.gov.hmrc" %% "reactivemongo-test" % "4.10.0-play-25" % scope,
   "org.scalatest" %% "scalatest" % "3.0.1" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
   "org.mockito" % "mockito-core" % "2.10.0" % scope,
@@ -61,14 +57,14 @@ lazy val microservice = (project in file("."))
   .settings(
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
   )
-  .settings(testOptions in Test := Seq(Tests.Filter(unitFilter)),
+  .settings(testOptions in Test := Seq(Tests.Filter(unitFilter), Tests.Argument("-eT")),
     addTestReportOption(Test, "test-reports")
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
     Keys.fork in IntegrationTest := false,
-    testOptions in IntegrationTest := Seq(Tests.Filter(itTestFilter)),
+    testOptions in IntegrationTest := Seq(Tests.Filter(itTestFilter), Tests.Argument("-eT")),
     unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest) (base => Seq(base / "test")),
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),

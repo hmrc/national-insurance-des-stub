@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationalinsurancedesstub.config
+package uk.gov.hmrc.nationalinsurancedesstub.models
 
-import uk.gov.hmrc.http.hooks.HttpHooks
-import uk.gov.hmrc.http.{HttpDelete, HttpGet, HttpPost, HttpPut}
-import uk.gov.hmrc.play.config.AppName
-import uk.gov.hmrc.play.http.ws._
+import play.api.libs.json.Json
 
-trait Hooks extends HttpHooks {
-  override val hooks = NoneRequired
+case class Registration(serviceName: String, serviceUrl: String, metadata:Option[Map[String, String]] = None)
+
+object Registration {
+  implicit val format = Json.format[Registration]
 }
-
-trait WSHttp extends HttpGet with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete with WSDelete with Hooks with AppName
-
-object WSHttp extends WSHttp
