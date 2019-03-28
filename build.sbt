@@ -18,7 +18,7 @@ lazy val compile = Seq(
   ws,
   "uk.gov.hmrc" %% "microservice-bootstrap" % "8.2.0",
   "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
-  "uk.gov.hmrc" %% "play-reactivemongo" % "6.2.0",
+  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.16.0-play-25",
   "uk.gov.hmrc" %% "domain" % "5.6.0-play-25"
 )
 
@@ -26,7 +26,7 @@ lazy val scope: String = "test,it"
 
 def test = Seq(
   "uk.gov.hmrc" %% "hmrctest" % "3.6.0-play-25" % scope,
-  "uk.gov.hmrc" %% "reactivemongo-test" % "3.1.0" % scope,
+  "uk.gov.hmrc" %% "reactivemongo-test" % "4.10.0-play-25" % scope,
   "org.scalatest" %% "scalatest" % "3.0.1" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
   "org.mockito" % "mockito-core" % "2.10.0" % scope,
