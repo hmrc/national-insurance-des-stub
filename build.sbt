@@ -19,13 +19,13 @@ lazy val compile = Seq(
   "uk.gov.hmrc" %% "microservice-bootstrap" % "8.2.0",
   "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
   "uk.gov.hmrc" %% "play-reactivemongo" % "6.2.0",
-  "uk.gov.hmrc" %% "domain" % "5.2.0"
+  "uk.gov.hmrc" %% "domain" % "5.6.0-play-25"
 )
 
 lazy val scope: String = "test,it"
 
 def test = Seq(
-  "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
+  "uk.gov.hmrc" %% "hmrctest" % "3.6.0-play-25" % scope,
   "uk.gov.hmrc" %% "reactivemongo-test" % "3.1.0" % scope,
   "org.scalatest" %% "scalatest" % "3.0.1" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
@@ -61,14 +61,14 @@ lazy val microservice = (project in file("."))
   .settings(
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
   )
-  .settings(testOptions in Test := Seq(Tests.Filter(unitFilter)),
+  .settings(testOptions in Test := Seq(Tests.Filter(unitFilter), Tests.Argument("-eT")),
     addTestReportOption(Test, "test-reports")
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
     Keys.fork in IntegrationTest := false,
-    testOptions in IntegrationTest := Seq(Tests.Filter(itTestFilter)),
+    testOptions in IntegrationTest := Seq(Tests.Filter(itTestFilter), Tests.Argument("-eT")),
     unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest) (base => Seq(base / "test")),
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
