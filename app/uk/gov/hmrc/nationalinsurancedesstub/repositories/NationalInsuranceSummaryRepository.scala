@@ -17,7 +17,7 @@
 package uk.gov.hmrc.nationalinsurancedesstub.repositories
 
 import javax.inject.{Inject, Singleton}
-
+import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.mongo.ReactiveRepository
@@ -32,11 +32,11 @@ class NationalInsuranceSummaryRepository @Inject()(mongo: ReactiveMongoComponent
     formatNationalInsuranceSummary, formatObjectId) {
 
   def store[T <: NationalInsuranceSummary](nationalInsuranceSummary: T): Future[T] = {
-    remove("utr" -> nationalInsuranceSummary.utr, "taxYear" -> nationalInsuranceSummary.taxYear) map {
-      _ => insert(nationalInsuranceSummary)
-    } map {
-      _ => nationalInsuranceSummary
-    }
+    findAndUpdate(
+      Json.obj("utr" -> nationalInsuranceSummary.utr, "taxYear" -> nationalInsuranceSummary.taxYear),
+      Json.toJson(nationalInsuranceSummary).as[JsObject],
+      fetchNewObject = false,
+      upsert = true).map(_ => nationalInsuranceSummary)
   }
 
   def fetch(utr: String, taxYear: String): Future[Option[NationalInsuranceSummary]] = {
