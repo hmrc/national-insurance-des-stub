@@ -50,7 +50,6 @@ lazy val microservice = (project in file("."))
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    routesGenerator := StaticRoutesGenerator,
     majorVersion := 0
   )
   .settings(routesImport += "uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders._")
