@@ -29,8 +29,6 @@ case class TaxYear(ty: String) {
 object TaxYear {
   final val TaxYearRegex = """^(\d{4})-(\d{2})$"""
 
-  def build(ty: String): Option[TaxYear] = TaxYearRegex.r findFirstIn ty map (TaxYear(_))
-
   val matchTaxYear: String => Option[Match] = new Regex(TaxYear.TaxYearRegex, "first", "second") findFirstMatchIn _
 
   def isValid(taxYearReference: String) = matchTaxYear(taxYearReference) map {
