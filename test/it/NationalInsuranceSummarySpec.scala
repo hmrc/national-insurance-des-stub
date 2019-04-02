@@ -21,95 +21,71 @@ import it.helpers.BaseSpec
 import play.api.http.HeaderNames
 import play.api.http.Status.{BAD_REQUEST, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.Json
+import scalaj.http.Http
 import uk.gov.hmrc.mongo.MongoSpecSupport
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
 
 import scala.concurrent.Await.result
 import scala.concurrent.ExecutionContext.Implicits.global
-import scalaj.http.Http
 
 class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
-  feature("Fetch National Insurance summary") {
-    scenario("No data is returned because UTR and tax year are not found") {
-      When("I request a National Insurance summary for a given UTR and tax year")
-      val response = fetchNationalInsuranceSummary("2234567890", "2015")
 
-      Then("The response should indicate that no data was found")
-      response.code shouldBe NOT_FOUND
+  private val validUtr = "2234567890"
+  private val invalidUtr = "INVALID"
+
+  private val validTaxYear = "2014-15"
+  private val invalidTaxYear = "15"
+  private val validTaxYearEnd = "2015"
+
+  private val emptyPayload = "{}"
+  private val happyPath1Payload = """{ "scenario": "HAPPY_PATH_1" }"""
+  private val happyPath2Payload = """{ "scenario": "HAPPY_PATH_2" }"""
+  private val invalidScenarioPayload = """{ "scenario": "NON_EXISTENT" }"""
+
+  val happyPath1FilePath = "/public/scenarios/HAPPY_PATH_1.json"
+  val happyPath2FilePath = "/public/scenarios/HAPPY_PATH_2.json"
+
+  feature("Prime National Insurance summary") {
+
+    scenario("400 BAD REQUEST is returned when UTR is invalid") {
+      When("I attempt to prime a National Insurance summary for an invalid UTR and valid tax year")
+      val response = primeNationalInsuranceSummary(invalidUtr, validTaxYear, emptyPayload)
+
+      Then("The response status should be BAD REQUEST")
+      response.code shouldBe BAD_REQUEST
+
+      And("The statusCode should be 400")
+      (Json.parse(response.body) \ "statusCode").as[Int] shouldBe BAD_REQUEST
+
+      And("The error message should be ERROR_SA_UTR_INVALID")
+      (Json.parse(response.body) \ "message").as[String] shouldBe "ERROR_SA_UTR_INVALID"
+    }
+
+    scenario("400 BAD REQUEST is returned when tax year is invalid") {
+      When("I attempt to prime a National Insurance summary for a valid UTR and invalid tax year")
+      val response = primeNationalInsuranceSummary(validUtr, invalidTaxYear, emptyPayload)
+
+      Then("The response status should be BAD REQUEST")
+      response.code shouldBe BAD_REQUEST
+
+      And("The statusCode should be 400")
+      (Json.parse(response.body) \ "statusCode").as[Int] shouldBe BAD_REQUEST
+
+      And("The error message should be ERROR_TAX_YEAR_INVALID")
+      (Json.parse(response.body) \ "message").as[String] shouldBe "ERROR_TAX_YEAR_INVALID"
     }
 
     scenario("National Insurance summary can be primed") {
       When("I prime a National Insurance summary for a given UTR and tax year")
-      val primeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", """{ "scenario": "HAPPY_PATH_2" }""")
+      val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath2Payload)
 
       Then("The response should indicate that the summary has been created")
       primeResponse.code shouldBe CREATED
-    }
-
-
-    scenario("National Insurance summary is returned when primed with specific scenario") {
-      When("I prime a National Insurance summary for a given UTR and tax year")
-      val primeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", """{ "scenario": "HAPPY_PATH_2" }""")
-
-      Then("The response should indicate that the summary has been created")
-      primeResponse.code shouldBe CREATED
-
-      And("I request a National Insurance summary for the same UTR and tax year")
-      val response = fetchNationalInsuranceSummary("2234567890", "2015")
-
-      Then("The response code should be OK")
-      response.code shouldBe OK
-
-      And("The response should contain the National Insurance summary")
-      val expected = loadResource("/public/scenarios/HAPPY_PATH_2.json")
-      Json.parse(response.body) shouldBe Json.parse(expected)
-    }
-
-    scenario("Happy Path 1 National Insurance summary is returned when primed with default scenario") {
-      When("I prime a National Insurance summary for a given UTR and tax year")
-      val primeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", "{}")
-
-      Then("The response should indicate that the summary has been created")
-      primeResponse.code shouldBe CREATED
-
-      And("I request a National Insurance summary for the same UTR and tax year")
-      val response = fetchNationalInsuranceSummary("2234567890", "2015")
-
-      Then("The response code should be OK")
-      response.code shouldBe OK
-
-      And("The response should contain the National Insurance summary")
-      val expected = loadResource("/public/scenarios/HAPPY_PATH_1.json")
-      Json.parse(response.body) shouldBe Json.parse(expected)
-    }
-
-    scenario("National Insurance summary can be re-primed with a different scenario") {
-      When("I prime a National Insurance summary for a given UTR and tax year")
-      val initialPrimeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", """{ "scenario": "HAPPY_PATH_1" }""")
-
-      Then("The response should indicate that the summary has been created")
-      initialPrimeResponse.code shouldBe CREATED
-
-      And("I re-prime the National Insurance summary for the same UTR and tax year with a different scenario")
-      val primeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", """{ "scenario": "HAPPY_PATH_2" }""")
-
-      Then("The response should indicate that the summary has been created")
-      primeResponse.code shouldBe CREATED
-
-      And("I request a National Insurance summary for the same UTR and tax year")
-      val response = fetchNationalInsuranceSummary("2234567890", "2015")
-
-      Then("The response code should be OK")
-      response.code shouldBe OK
-
-      And("The response should contain the National Insurance summary for the changed scenario")
-      val expected = loadResource("/public/scenarios/HAPPY_PATH_2.json")
-      Json.parse(response.body) shouldBe Json.parse(expected)
     }
 
     scenario("National Insurance summary cannot be primed with an invalid scenario") {
-      When("I prime a National Insurance summary with an invalid scenario")
-      val primeResponse = primeNationalInsuranceSummary("2234567890", "2014-15", """{ "scenario": "NON_EXISTENT" }""")
+      When("I attempt to prime a National Insurance summary with an invalid scenario")
+      val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, invalidScenarioPayload)
 
       Then("The response code should be BAD_REQUEST")
       primeResponse.code shouldBe BAD_REQUEST
@@ -118,6 +94,77 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
       (Json.parse(primeResponse.body) \ "code").as[String] shouldBe "UNKNOWN_SCENARIO"
     }
 
+  }
+
+  feature("Fetch National Insurance summary") {
+
+    scenario("No data is returned because UTR and tax year are not found") {
+      When("I request a National Insurance summary for a given UTR and tax year")
+      val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
+
+      Then("The response should indicate that no data was found")
+      response.code shouldBe NOT_FOUND
+    }
+
+    scenario("National Insurance summary is returned when primed with specific scenario") {
+      When("I prime a National Insurance summary for a given UTR and tax year")
+      val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath2Payload)
+
+      Then("The response should indicate that the summary has been created")
+      primeResponse.code shouldBe CREATED
+
+      And("I request a National Insurance summary for the same UTR and tax year")
+      val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
+
+      Then("The response code should be OK")
+      response.code shouldBe OK
+
+      And("The response should contain the National Insurance summary")
+      val expected = loadResource(happyPath2FilePath)
+      Json.parse(response.body) shouldBe Json.parse(expected)
+    }
+
+    scenario("Happy Path 1 National Insurance summary is returned when primed with default scenario") {
+      When("I prime a National Insurance summary for a given UTR and tax year")
+      val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, emptyPayload)
+
+      Then("The response should indicate that the summary has been created")
+      primeResponse.code shouldBe CREATED
+
+      And("I request a National Insurance summary for the same UTR and tax year")
+      val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
+
+      Then("The response code should be OK")
+      response.code shouldBe OK
+
+      And("The response should contain the National Insurance summary")
+      val expected = loadResource(happyPath1FilePath)
+      Json.parse(response.body) shouldBe Json.parse(expected)
+    }
+
+    scenario("National Insurance summary can be re-primed with a different scenario") {
+      When("I prime a National Insurance summary for a given UTR and tax year")
+      val initialPrimeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath1Payload)
+
+      Then("The response should indicate that the summary has been created")
+      initialPrimeResponse.code shouldBe CREATED
+
+      And("I re-prime the National Insurance summary for the same UTR and tax year with a different scenario")
+      val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath2Payload)
+
+      Then("The response should indicate that the summary has been created")
+      primeResponse.code shouldBe CREATED
+
+      And("I request a National Insurance summary for the same UTR and tax year")
+      val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
+
+      Then("The response code should be OK")
+      response.code shouldBe OK
+
+      And("The response should contain the National Insurance summary for the changed scenario")
+      val expected = loadResource(happyPath2FilePath)
+      Json.parse(response.body) shouldBe Json.parse(expected)
+    }
   }
 
   private def primeNationalInsuranceSummary(utr: String, taxYear: String, payload: String) =
