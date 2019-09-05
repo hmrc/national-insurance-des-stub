@@ -12,17 +12,17 @@ lazy val appName = "national-insurance-des-stub"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test
 
 lazy val compile = Seq(
-  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.9.0",
+  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.16.0",
   "uk.gov.hmrc" %% "play-hmrc-api" % "3.4.0-play-25",
-  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.16.0-play-25",
+  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.20.0-play-25",
   "uk.gov.hmrc" %% "domain" % "5.6.0-play-25"
 )
 
 lazy val scope: String = "test,it"
 
 def test = Seq(
-  "uk.gov.hmrc" %% "hmrctest" % "3.6.0-play-25" % scope,
-  "uk.gov.hmrc" %% "reactivemongo-test" % "4.10.0-play-25" % scope,
+  "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-25" % scope,
+  "uk.gov.hmrc" %% "reactivemongo-test" % "4.15.0-play-25" % scope,
   "org.scalatest" %% "scalatest" % "3.0.1" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
   "org.mockito" % "mockito-core" % "2.10.0" % scope,
