@@ -16,7 +16,6 @@ API microservices that make calls to DES for National Insurance data should be c
 instead of to a real DES when they are deployed to the External Test environment
 
 ## What does this service use?
-* Service Locator
 * Datastream
 * Metrics/Grafana
 

@@ -16,56 +16,22 @@
 
 package it
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, TestData}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.http.Status.NO_CONTENT
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.{Application, Mode}
-import uk.gov.hmrc.api.domain.Registration
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**
   * Testcase to verify the capability of integration with the API platform.
   *
-  * 1, To integrate with API platform the service needs to register itself to the service locator by calling the /registration endpoint and providing
-  * - application name
-  * - application url
-  *
-  * 2a, To expose API's to Third Party Developers, the service needs to make the API definition available under api/definition GET endpoint
-  * 2b, The endpoints need to be defined in an application.raml file for all versions  For all of the endpoints defined documentation will be provided and be
+  * 1a, To expose API's to Third Party Developers, the service needs to make the API definition available under api/definition GET endpoint
+  * 1b, The endpoints need to be defined in an application.raml file for all versions  For all of the endpoints defined documentation will be provided and be
   * available under api/documentation/[version]/[endpoint name] GET endpoint
   * Example: api/documentation/1.0/Fetch-Some-Data
   */
-class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach with GuiceOneAppPerTest {
-
-  val stubHost = "localhost"
-  val stubPort = sys.env.getOrElse("WIREMOCK_SERVICE_LOCATOR_PORT", "11111").toInt
-  val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
-
-  override def newAppForTest(testData: TestData): Application = GuiceApplicationBuilder()
-    .configure("run.mode" -> "Stub")
-    .configure(Map(
-      "appName" -> "application-name",
-      "appUrl" -> "http://localhost",
-      "Test.microservice.services.service-locator.host" -> stubHost,
-      "Test.microservice.services.service-locator.port" -> stubPort,
-      "Test.microservice.services.service-locator.enabled" -> true
-    )).in(Mode.Test).build()
-
-  override def beforeEach() {
-    wireMockServer.start()
-    WireMock.configureFor(stubHost, stubPort)
-    stubFor(post(urlMatching("/registration")).willReturn(aResponse().withStatus(NO_CONTENT)))
-  }
+class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutures with GuiceOneAppPerTest {
 
   trait Setup {
     val documentationController = app.injector.instanceOf[DocumentationController]
@@ -73,15 +39,6 @@ class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutur
   }
 
   "microservice" should {
-
-    "register itelf to service-locator" in new Setup {
-      def regPayloadStringFor(serviceName: String, serviceUrl: String): String =
-        Json.toJson(Registration(serviceName, serviceUrl, Some(Map("third-party-api" -> "true")))).toString
-
-      verify(1, postRequestedFor(urlMatching("/registration")).
-        withHeader("content-type", equalTo("application/json")).
-        withRequestBody(equalTo(regPayloadStringFor("application-name", "http://localhost"))))
-    }
 
     "provide definition endpoint" in new Setup {
       val result = documentationController.definition()(request)
@@ -92,10 +49,5 @@ class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutur
       val result = documentationController.raml("1.0", "application.raml")(request)
       status(result) shouldBe 200
     }
-  }
-
-  override protected def afterEach(): Unit = {
-    wireMockServer.stop()
-    wireMockServer.resetMappings()
   }
 }
