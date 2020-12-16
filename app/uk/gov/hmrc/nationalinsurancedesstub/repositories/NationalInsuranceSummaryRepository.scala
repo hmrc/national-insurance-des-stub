@@ -23,11 +23,10 @@ import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NationalInsuranceSummaryRepository @Inject()(mongo: ReactiveMongoComponent)
+class NationalInsuranceSummaryRepository @Inject()(mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
   extends ReactiveRepository[NationalInsuranceSummary, BSONObjectID]("national-insurance-summary", mongo.mongoConnector.db,
     formatNationalInsuranceSummary, formatObjectId) {
 

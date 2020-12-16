@@ -16,14 +16,17 @@
 
 package unit.controllers
 
+import akka.stream.Materializer
 import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.verify
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.HeaderNames
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
+import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController
@@ -38,21 +41,24 @@ import scala.concurrent.Future
 class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar with WithFakeApplication {
 
   trait Setup {
-    val request = FakeRequest().withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
-    implicit val headerCarrier = HeaderCarrier()
-    implicit val mat = fakeApplication.materializer
+    val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
+    implicit val mat: Materializer = fakeApplication.materializer
 
-    val underTest = new NationalInsuranceSummaryController(mock[ScenarioLoader], mock[NationalInsuranceSummaryService])
+    val underTest = new NationalInsuranceSummaryController(
+      mock[ScenarioLoader],
+      mock[NationalInsuranceSummaryService],
+      stubControllerComponents())
 
-    def request(jsonPayload: JsValue) = {
+    def request(jsonPayload: JsValue): FakeRequest[JsValue] = {
       FakeRequest().withHeaders(HeaderNames.ACCEPT -> "application/vnd.hmrc.1.0+json").withBody[JsValue](jsonPayload)
     }
 
-    def createSummaryRequest(scenario: String) = {
+    def createSummaryRequest(scenario: String): FakeRequest[JsValue] = {
       request(Json.parse(s"""{ "scenario": "$scenario" }"""))
     }
 
-    def emptyRequest = {
+    def emptyRequest: FakeRequest[JsValue] = {
       request(Json.parse("{}"))
     }
 
@@ -65,7 +71,7 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
 
       given(underTest.service.fetch(anyString, anyString)).willReturn(Future(Some(NationalInsuranceSummary("2234567890", "2014", nics))))
 
-      val result = await(underTest.fetch("2234567890", "2014")(request))
+      val result: Result = await(underTest.fetch("2234567890", "2014")(request))
 
       status(result) shouldBe OK
       jsonBodyOf(result) shouldBe Json.toJson(nics)
@@ -75,7 +81,7 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
 
       given(underTest.service.fetch(anyString, anyString)).willReturn(Future(None))
 
-      val result = await(underTest.fetch("2234567890", "2014")(request))
+      val result: Result = await(underTest.fetch("2234567890", "2014")(request))
 
       status(result) shouldBe NOT_FOUND
     }
@@ -84,7 +90,7 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
 
       given(underTest.service.fetch(anyString, anyString)).willReturn(Future.failed(new RuntimeException("expected test error")))
 
-      val result = await(underTest.fetch("2234567890", "2014")(request))
+      val result: Result = await(underTest.fetch("2234567890", "2014")(request))
 
       status(result) shouldBe INTERNAL_SERVER_ERROR
     }
@@ -97,7 +103,7 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
       given(underTest.scenarioLoader.loadScenario(anyString)).willReturn(Future.successful(nics))
       given(underTest.service.create(anyString, anyString, any[NICs])).willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
 
-      val result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("HAPPY_PATH_2")))
+      val result: Result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("HAPPY_PATH_2")))
 
       status(result) shouldBe CREATED
       verify(underTest.scenarioLoader).loadScenario("HAPPY_PATH_2")
@@ -109,7 +115,7 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
       given(underTest.scenarioLoader.loadScenario(anyString)).willReturn(Future.successful(nics))
       given(underTest.service.create(anyString, anyString, any[NICs])).willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
 
-      val result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(emptyRequest))
+      val result: Result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(emptyRequest))
 
       status(result) shouldBe CREATED
       verify(underTest.scenarioLoader).loadScenario("HAPPY_PATH_1")
@@ -121,7 +127,7 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
       given(underTest.scenarioLoader.loadScenario(anyString)).willReturn(Future.successful(nics))
       given(underTest.service.create(anyString, anyString, any[NICs])).willReturn(Future.failed(new RuntimeException("expected test error")))
 
-      val result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("HAPPY_PATH_2")))
+      val result: Result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("HAPPY_PATH_2")))
 
       status(result) shouldBe INTERNAL_SERVER_ERROR
     }
@@ -130,7 +136,7 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
 
       given(underTest.scenarioLoader.loadScenario(anyString)).willReturn(Future.failed(new InvalidScenarioException("INVALID")))
 
-      val result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("INVALID")))
+      val result: Result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("INVALID")))
 
       status(result) shouldBe BAD_REQUEST
       (jsonBodyOf(result) \ "code").as[String] shouldBe "UNKNOWN_SCENARIO"

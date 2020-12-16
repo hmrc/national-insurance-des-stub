@@ -17,11 +17,14 @@
 package it
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
 import uk.gov.hmrc.play.test.UnitSpec
+
+import scala.concurrent.Future
 
 /**
   * Testcase to verify the capability of integration with the API platform.
@@ -34,19 +37,19 @@ import uk.gov.hmrc.play.test.UnitSpec
 class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutures with GuiceOneAppPerTest {
 
   trait Setup {
-    val documentationController = app.injector.instanceOf[DocumentationController]
-    val request = FakeRequest()
+    val documentationController: DocumentationController = app.injector.instanceOf[DocumentationController]
+    val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   }
 
   "microservice" should {
 
     "provide definition endpoint" in new Setup {
-      val result = documentationController.definition()(request)
+      val result: Future[Result] = documentationController.definition()(request)
       status(result) shouldBe 200
     }
 
     "provide RAML conf endpoint" in new Setup {
-      val result = documentationController.raml("1.0", "application.raml")(request)
+      val result: Future[Result] = documentationController.raml("1.0", "application.raml")(request)
       status(result) shouldBe 200
     }
   }

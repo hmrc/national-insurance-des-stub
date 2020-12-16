@@ -17,18 +17,19 @@
 package uk.gov.hmrc.nationalinsurancedesstub.services
 
 import javax.inject.{Inject, Singleton}
-
 import uk.gov.hmrc.nationalinsurancedesstub.models.{NICs, NationalInsuranceSummary}
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
+
+import scala.concurrent.Future
 
 @Singleton
 class NationalInsuranceSummaryService @Inject()(val repository: NationalInsuranceSummaryRepository) {
 
-  def create(utr: String, taxYearEnd: String, nics: NICs) = {
+  def create(utr: String, taxYearEnd: String, nics: NICs): Future[NationalInsuranceSummary] = {
     repository.store(NationalInsuranceSummary(utr, taxYearEnd, nics))
   }
 
-  def fetch(utr: String, taxYearEnd: String) = {
+  def fetch(utr: String, taxYearEnd: String): Future[Option[NationalInsuranceSummary]] = {
     repository.fetch(utr, taxYearEnd)
   }
 }
