@@ -23,14 +23,16 @@ import play.api.mvc.Results.Status
 import play.api.mvc._
 import uk.gov.hmrc.nationalinsurancedesstub.controllers._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.bootstrap.http.JsonErrorHandler
+import uk.gov.hmrc.play.bootstrap.backend.http.JsonErrorHandler
+import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ErrorHandler @Inject()(configuration: Configuration,
+                            auditEvent: HttpAuditEvent,
                              auditConnector: AuditConnector
-                            ) extends JsonErrorHandler(configuration, auditConnector) {
+                            )(implicit ec: ExecutionContext) extends JsonErrorHandler(auditConnector, auditEvent, configuration) {
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     if (statusCode == play.api.http.Status.BAD_REQUEST) {

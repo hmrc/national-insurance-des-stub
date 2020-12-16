@@ -17,22 +17,22 @@
 package uk.gov.hmrc.nationalinsurancedesstub.controllers
 
 import javax.inject.{Inject, Singleton}
-
-import controllers.AssetsBuilder
-import play.api.http.HttpErrorHandler
-import play.api.mvc.Action
+import controllers.Assets
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.nationalinsurancedesstub.config.AppContext
 import uk.gov.hmrc.nationalinsurancedesstub.models.APIAccess
 import uk.gov.hmrc.nationalinsurancedesstub.views.txt
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 @Singleton
-class DocumentationController @Inject()(httpErrorHandler: HttpErrorHandler, appContext: AppContext)
-  extends AssetsBuilder(httpErrorHandler) with BaseController {
+class DocumentationController @Inject()(appContext: AppContext,
+    assets: Assets,
+    val cc: ControllerComponents)
+  extends BackendController(cc) {
 
-  def definition = Action {
+  def definition: Action[AnyContent] = Action {
     Ok(txt.definition(APIAccess.build(appContext.access))).withHeaders(CONTENT_TYPE -> JSON)
   }
 
-  def raml(version: String, file: String) = super.at(s"/public/api/conf/$version", file)
+  def raml(version: String, file: String): Action[AnyContent] = assets.at(s"/public/api/conf/$version", file)
 }

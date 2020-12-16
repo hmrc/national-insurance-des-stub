@@ -22,16 +22,17 @@ import scala.util.matching.Regex.Match
 case class TaxYear(ty: String) {
   if(!TaxYear.isValid(ty)) throw new IllegalArgumentException
 
-  val startYr = ty.split("-")(0)
-  val endYr = (startYr.toInt + 1).toString
+  val startYr: String = ty.split("-")(0)
+  val endYr: String = (startYr.toInt + 1).toString
 }
 
 object TaxYear {
+
   final val TaxYearRegex = """^(\d{4})-(\d{2})$"""
 
   val matchTaxYear: String => Option[Match] = new Regex(TaxYear.TaxYearRegex, "first", "second") findFirstMatchIn _
 
-  def isValid(taxYearReference: String) = matchTaxYear(taxYearReference) map {
+  def isValid(taxYearReference: String): Boolean = matchTaxYear(taxYearReference) exists {
     r => (r.group("first").toInt + 1) % 100 == r.group("second").toInt
-  } getOrElse (false)
+  }
 }

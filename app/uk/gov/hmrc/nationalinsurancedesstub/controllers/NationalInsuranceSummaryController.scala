@@ -17,22 +17,26 @@
 package uk.gov.hmrc.nationalinsurancedesstub.controllers
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.libs.json._
-import play.api.mvc._
+import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class NationalInsuranceSummaryController @Inject()(val scenarioLoader: ScenarioLoader, val service: NationalInsuranceSummaryService)
-  extends BaseController with HeaderValidator {
+class NationalInsuranceSummaryController @Inject()(val scenarioLoader: ScenarioLoader,
+    val service: NationalInsuranceSummaryService,
+    val cc: ControllerComponents)
+  extends BackendController(cc) with HeaderValidator {
 
-  def fetch(utr: String, taxEndYear: String) = Action.async {
+  implicit val executionContext: ExecutionContext = cc.executionContext
+  val parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
+
+  def fetch(utr: String, taxEndYear: String): Action[AnyContent] = Action.async {
     service.fetch(utr, taxEndYear) map {
       case Some(result) => Ok(Json.toJson(result.nics))
       case _ => NotFound
@@ -41,7 +45,7 @@ class NationalInsuranceSummaryController @Inject()(val scenarioLoader: ScenarioL
     }
   }
 
-  def create(saUtr: SaUtr, taxYear: TaxYear) = validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+  def create(saUtr: SaUtr, taxYear: TaxYear): Action[JsValue] = validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
     withJsonBody[CreateSummaryRequest] { createSummaryRequest =>
       val scenario = createSummaryRequest.scenario.getOrElse("HAPPY_PATH_1")
 
@@ -51,7 +55,7 @@ class NationalInsuranceSummaryController @Inject()(val scenarioLoader: ScenarioL
       } yield Created(Json.toJson(nics))
 
     } recover {
-      case _: InvalidScenarioException => BadRequest(ErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))
+      case _: InvalidScenarioException => BadRequest(JsonErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))
       case _ => InternalServerError
     }
   }
