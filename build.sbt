@@ -1,7 +1,5 @@
-import _root_.play.sbt.routes.RoutesKeys.{routesGenerator, routesImport}
+import _root_.play.sbt.routes.RoutesKeys.routesImport
 import play.core.PlayVersion
-import play.routes.compiler.StaticRoutesGenerator
-import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
@@ -9,76 +7,72 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.versioning.SbtGitVersioning
 
 lazy val appName = "national-insurance-des-stub"
-lazy val appDependencies: Seq[ModuleID] = compile ++ test
+val silencerVersion = "1.7.1"
 
-lazy val compile = Seq(
-  "uk.gov.hmrc" %% "bootstrap-play-25" % "5.1.0",
-  "uk.gov.hmrc" %% "play-hmrc-api" % "4.1.0-play-25",
-  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.23.0-play-25",
-  "uk.gov.hmrc" %% "domain" % "5.6.0-play-25"
-)
-
-lazy val scope: String = "test,it"
-
-def test = Seq(
-  "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-25" % scope,
-  "uk.gov.hmrc" %% "reactivemongo-test" % "4.15.0-play-25" % scope,
-  "org.scalatest" %% "scalatest" % "3.0.1" % scope,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
-  "org.mockito" % "mockito-core" % "2.10.0" % scope,
-  "org.pegdown" % "pegdown" % "1.6.0" % scope,
-  "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-  "org.scalaj" %% "scalaj-http" % "2.3.0" % scope,
-  "com.github.tomakehurst" % "wiremock" % "2.8.0" % scope
-)
-
-lazy val plugins: Seq[Plugins] = Seq.empty
-lazy val playSettings: Seq[Setting[_]] = Seq.empty
+lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 
 def unitFilter(name: String): Boolean = name startsWith "unit"
 def itTestFilter(name: String): Boolean = name startsWith "it"
 
+lazy val compile = Seq(
+  "uk.gov.hmrc" %% "bootstrap-backend-play-26" % "3.2.0",
+  "uk.gov.hmrc" %% "play-hmrc-api" % "4.1.0-play-26",
+  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.31.0-play-26",
+  "uk.gov.hmrc" %% "domain" % "5.10.0-play-26",
+  compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
+  "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+)
+
+def test(scope: String = "test, it") = Seq(
+  "uk.gov.hmrc" %% "hmrctest" % "3.10.0-play-26" % scope,
+  "uk.gov.hmrc" %% "reactivemongo-test" % "4.22.0-play-26" % scope,
+  "org.scalatest" %% "scalatest" % "3.0.9" % scope,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3" % scope,
+  "org.mockito" % "mockito-core" % "2.10.0" % scope,
+  "org.pegdown" % "pegdown" % "1.6.0" % scope,
+  "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+  "org.scalaj" %% "scalaj-http" % "2.3.0" % scope,
+  "com.github.tomakehurst" % "wiremock-jre8" % "2.26.3" % scope
+)
+
+defaultSettings()
+
 lazy val microservice = (project in file("."))
-  .enablePlugins(Seq(_root_.play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory) ++ plugins: _*)
-  .settings(playSettings: _*)
-  .settings(scalaSettings: _*)
-  .settings(publishingSettings: _*)
-  .settings(defaultSettings(): _*)
-  .settings(
-    name := appName,
-    scalaVersion := "2.11.11",
-    libraryDependencies ++= appDependencies,
-    retrieveManaged := true,
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    majorVersion := 0
-  )
-  .settings(routesImport += "uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders._")
-  .settings(
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
-  )
-  .settings(testOptions in Test := Seq(Tests.Filter(unitFilter), Tests.Argument("-eT")),
-    addTestReportOption(Test, "test-reports")
-  )
+  .settings(unmanagedResourceDirectories in Compile += baseDirectory.value / "resources")
+  .settings(testOptions in Test := Seq(Tests.Filter(unitFilter), Tests.Argument("-eT")))
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
-  .settings(
-    Keys.fork in IntegrationTest := false,
-    testOptions in IntegrationTest := Seq(Tests.Filter(itTestFilter), Tests.Argument("-eT")),
-    unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest) (base => Seq(base / "test")),
-    addTestReportOption(IntegrationTest, "int-test-reports"),
-    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    parallelExecution in IntegrationTest := false)
-  .settings(resolvers ++= Seq(
-    Resolver.bintrayRepo("hmrc", "releases"),
-    Resolver.jcenterRepo
-  ))
+  .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
 
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
-  tests map {
-    test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
-  }
+enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+
+name := appName
+scalaSettings
+majorVersion := 0
+scalaVersion := "2.12.12"
+publishingSettings
+integrationTestSettings
+retrieveManaged := true
+routesImport += "uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders._"
+resolvers ++= Seq(
+  Resolver.bintrayRepo("hmrc", "releases"),
+  Resolver.jcenterRepo
+)
+PlayKeys.playDefaultPort := 9688
+evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
+
+javaOptions in Test += "-Dconfig.resource=test.application.conf"
+fork in Test := true
+testOptions in IntegrationTest := Seq(Tests.Filter(itTestFilter), Tests.Argument("-eT"))
+unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest) (base => Seq(base / "test")).value
+
+libraryDependencies ++= appDependencies
 
 // Coverage configuration
 coverageMinimum := 84
 coverageFailOnMinimum := true
 coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"
+
+scalacOptions ++= Seq(
+  "-P:silencer:pathFilters=views;routes"
+)

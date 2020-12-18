@@ -20,6 +20,6 @@ import play.api.libs.json.Json
 
 class InvalidScenarioException(scenario: String) extends RuntimeException(s"$scenario is not a valid test scenario")
 
-object ErrorResponse {
+object JsonErrorResponse {
   def apply(code: String, message: String) = { Json.obj("code" -> code, "message" -> message) }
 }

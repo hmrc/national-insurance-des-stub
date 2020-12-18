@@ -17,14 +17,9 @@
 package uk.gov.hmrc.nationalinsurancedesstub.config
 
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.config.ServicesConfig
+import play.api.Configuration
 
 @Singleton
-class AppContext @Inject()(override val runModeConfiguration: Configuration, environment: Environment) extends ServicesConfig {
-
-  override protected def mode = environment.mode
-
-  lazy val access = runModeConfiguration.getConfig(s"api.access")
-
+class AppContext @Inject()(configuration: Configuration) {
+  lazy val access: Option[Configuration] = configuration.getOptional[Configuration](s"api.access")
 }

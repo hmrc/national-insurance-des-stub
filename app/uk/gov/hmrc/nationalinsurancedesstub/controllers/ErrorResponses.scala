@@ -17,16 +17,22 @@
 package uk.gov.hmrc.nationalinsurancedesstub.controllers
 
 import play.api.http.Status._
+import play.api.libs.json.{Json, Writes}
 
 // This error response does not match the standard error response that is documented in the Dev Hub reference guide
 // Leaving it as it is for now so as to avoid a breaking change.
-sealed abstract class ErrorResponse(val httpStatusCode: Int,
-                                    val message: String)
+sealed case class ErrorResponse(httpStatusCode: Int, message: String)
 
-case object ErrorSaUtrInvalid extends ErrorResponse(BAD_REQUEST, "ERROR_SA_UTR_INVALID")
+object ErrorSaUtrInvalid extends ErrorResponse(BAD_REQUEST, "ERROR_SA_UTR_INVALID")
 
-case object ErrorTaxYearInvalid extends ErrorResponse(BAD_REQUEST, "ERROR_TAX_YEAR_INVALID")
+object ErrorTaxYearInvalid extends ErrorResponse(BAD_REQUEST, "ERROR_TAX_YEAR_INVALID")
 
-case object ErrorGenericBadRequest extends ErrorResponse(BAD_REQUEST, "ERROR_BAD_REQUEST")
+object ErrorGenericBadRequest extends ErrorResponse(BAD_REQUEST, "ERROR_BAD_REQUEST")
 
-case object ErrorNotFound extends ErrorResponse(NOT_FOUND, "ERROR_NOT_FOUND")
+object ErrorNotFound extends ErrorResponse(NOT_FOUND, "ERROR_NOT_FOUND")
+
+object ErrorResponse {
+  implicit val errorResponseWrites: Writes[ErrorResponse] = (e: ErrorResponse) =>
+    Json.obj("statusCode" -> e.httpStatusCode, "message" -> e.message)
+
+}

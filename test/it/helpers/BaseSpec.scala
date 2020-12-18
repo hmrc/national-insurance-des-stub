@@ -19,18 +19,17 @@ package it.helpers
 import java.util.concurrent.TimeUnit
 
 import org.scalatest._
-import org.scalatestplus.play.OneServerPerSuite
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.modules.reactivemongo.ReactiveMongoComponent
-import uk.gov.hmrc.mongo.MongoSpecSupport
+import uk.gov.hmrc.mongo.{MongoConnector, MongoSpecSupport}
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, FiniteDuration}
 
 trait BaseSpec extends FeatureSpec with MongoSpecSupport with BeforeAndAfterAll with BeforeAndAfterEach with Matchers
-  with OneServerPerSuite with GivenWhenThen {
+  with GuiceOneServerPerSuite with GivenWhenThen {
 
-  override lazy val port = 9000
 
   implicit override lazy val app: Application = GuiceApplicationBuilder().configure(
     "auditing.enabled" -> false,
@@ -39,8 +38,10 @@ trait BaseSpec extends FeatureSpec with MongoSpecSupport with BeforeAndAfterAll 
     "run.mode" -> "It"
   ).build()
 
-  val reactiveMongoComponent = new ReactiveMongoComponent { override val mongoConnector = mongoConnectorForTest }
+  val reactiveMongoComponent: ReactiveMongoComponent = new ReactiveMongoComponent {
+    override val mongoConnector: MongoConnector = mongoConnectorForTest
+  }
 
-  val timeout = Duration(5, TimeUnit.SECONDS)
+  val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://localhost:$port"
 }

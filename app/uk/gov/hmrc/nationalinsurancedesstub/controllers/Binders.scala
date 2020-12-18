@@ -23,26 +23,28 @@ import uk.gov.hmrc.referencechecker.SelfAssessmentReferenceChecker
 
 object Binders {
 
-  implicit def saUtrBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[SaUtr] {
+  implicit def saUtrBinder(implicit stringBinder: PathBindable[String]): PathBindable[SaUtr] = new PathBindable[SaUtr] {
 
     def unbind(key: String, saUtr: SaUtr): String = stringBinder.unbind(key, saUtr.value)
 
     def bind(key: String, value: String): Either[String, SaUtr] = {
-      SelfAssessmentReferenceChecker.isValid(value) match {
-        case true => Right(SaUtr(value))
-        case false => Left("ERROR_SA_UTR_INVALID")
+      if (SelfAssessmentReferenceChecker.isValid(value)) {
+        Right(SaUtr(value))
+      } else {
+        Left("ERROR_SA_UTR_INVALID")
       }
     }
   }
 
-  implicit def taxYearBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[TaxYear] {
+  implicit def taxYearBinder(implicit stringBinder: PathBindable[String]): PathBindable[TaxYear] = new PathBindable[TaxYear] {
 
     override def unbind(key: String, taxYear: TaxYear): String = stringBinder.unbind(key, taxYear.ty)
 
     override def bind(key: String, value: String): Either[String, TaxYear] = {
-      TaxYear.isValid(value) match {
-        case true => Right(TaxYear(value))
-        case false => Left("ERROR_TAX_YEAR_INVALID")
+      if (TaxYear.isValid(value)) {
+        Right(TaxYear(value))
+      } else {
+        Left("ERROR_TAX_YEAR_INVALID")
       }
     }
   }
