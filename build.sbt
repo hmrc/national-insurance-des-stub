@@ -44,20 +44,18 @@ lazy val microservice = (project in file("."))
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
 
-enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
 
 name := appName
 scalaSettings
 majorVersion := 0
 scalaVersion := "2.12.12"
 publishingSettings
-integrationTestSettings
+integrationTestSettings()
 retrieveManaged := true
 routesImport += "uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders._"
-resolvers ++= Seq(
-  Resolver.bintrayRepo("hmrc", "releases"),
-  Resolver.jcenterRepo
-)
+resolvers += Resolver.jcenterRepo
+
 PlayKeys.playDefaultPort := 9688
 evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
 
