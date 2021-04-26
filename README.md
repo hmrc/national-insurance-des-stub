@@ -1,6 +1,6 @@
 # National Insurance DES Stub
 
-[![Build Status](https://travis-ci.org/hmrc/national-insurance-des-stub.svg)](https://travis-ci.org/hmrc/national-insurance-des-stub) [ ![Download](https://api.bintray.com/packages/hmrc/releases/national-insurance-des-stub/images/download.svg) ](https://bintray.com/hmrc/releases/national-insurance-des-stub/_latestVersion)
+[![Build Status](https://travis-ci.org/hmrc/national-insurance-des-stub.svg)](https://travis-ci.org/hmrc/national-insurance-des-stub)
 
 The National Insurance DES Stub is a service to support stateful sandbox testing. It stubs the behaviour of DES for calls in the National Insurance domain so that API
 microservices can be configured to call the stub instead of real DES. Additionally, it exposes a test-support API
