@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package unit.controllers
 
-import org.scalatest.Matchers
+import org.scalatest.{Matchers, WordSpec}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders
-import uk.gov.hmrc.play.test.UnitSpec
 
-class UtrBinderSpec extends UnitSpec with Matchers{
+class UtrBinderSpec extends WordSpec with Matchers {
 
   "a valid utr '1097172564'" should {
     "be transformed to an SaUtr object" in {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,37 @@
 package unit.controllers
 
 import akka.stream.Materializer
-import org.mockito.ArgumentMatchers.{any, anyString}
+import org.mockito.ArgumentMatchers.{eq => argEq}
 import org.mockito.BDDMockito.given
-import org.mockito.Mockito.verify
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{Matchers, OptionValues, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.Application
 import play.api.http.HeaderNames
-import play.api.http.Status._
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.stubControllerComponents
+import play.api.test.Helpers.{contentAsJson, _}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar with WithFakeApplication {
 
-  trait Setup {
+
+class NationalInsuranceSummaryControllerSpec extends WordSpec with Matchers with OptionValues with MockitoSugar with GuiceOneServerPerSuite with ScalaFutures {
+
+  override lazy val fakeApplication: Application = GuiceApplicationBuilder(
+    disabled = Seq(classOf[com.kenshoo.play.metrics.PlayModule])
+  ).build()
+
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
     implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
     implicit val mat: Materializer = fakeApplication.materializer
@@ -63,83 +70,80 @@ class NationalInsuranceSummaryControllerSpec extends UnitSpec with MockitoSugar 
     }
 
     val nics = NICs(Class1NICs(10), Class2NICs(20), maxNICsReached = false)
-  }
+
 
   "fetch" should {
 
-    "return the happy path response when called with a utr and tax year that are found" in new Setup {
+    "return the happy path response when called with a utr and tax year that are found" in  {
 
-      given(underTest.service.fetch(anyString, anyString)).willReturn(Future(Some(NationalInsuranceSummary("2234567890", "2014", nics))))
+      given(underTest.service.fetch(argEq("2234567890"), argEq("2014"))).willReturn(Future(Some(NationalInsuranceSummary("2234567890", "2014", nics))))
 
-      val result: Result = await(underTest.fetch("2234567890", "2014")(request))
+      val result: Future[Result] = underTest.fetch("2234567890", "2014")(request)
 
       status(result) shouldBe OK
-      jsonBodyOf(result) shouldBe Json.toJson(nics)
+      contentAsJson(result) shouldBe Json.toJson(nics)
     }
 
-    "return a not found response when called with a utr and taxYear that are not found" in new Setup {
+    "return a not found response when called with a utr and taxYear that are not found" in  {
 
-      given(underTest.service.fetch(anyString, anyString)).willReturn(Future(None))
+      given(underTest.service.fetch(argEq("2234567890"), argEq("2014"))).willReturn(Future(None))
 
-      val result: Result = await(underTest.fetch("2234567890", "2014")(request))
+      val result: Result = underTest.fetch("2234567890", "2014")(request).futureValue
 
-      status(result) shouldBe NOT_FOUND
+      status(Future(result)) shouldBe NOT_FOUND
     }
 
-    "return an invalid server error when the service fails" in new Setup {
+    "return an invalid server error when the service fails" in {
 
-      given(underTest.service.fetch(anyString, anyString)).willReturn(Future.failed(new RuntimeException("expected test error")))
+      given(underTest.service.fetch(argEq("2234567890"), argEq("2014"))).willReturn(Future.failed(new RuntimeException("expected test error")))
 
-      val result: Result = await(underTest.fetch("2234567890", "2014")(request))
+      val result: Result = underTest.fetch("2234567890", "2014")(request).futureValue
 
-      status(result) shouldBe INTERNAL_SERVER_ERROR
+      status(Future(result)) shouldBe INTERNAL_SERVER_ERROR
     }
   }
 
   "create" should {
 
-    "return a created response and store the National Insurance summary" in new Setup {
+    "return a created response and store the National Insurance summary" in {
 
-      given(underTest.scenarioLoader.loadScenario(anyString)).willReturn(Future.successful(nics))
-      given(underTest.service.create(anyString, anyString, any[NICs])).willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
+      given(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_2"))).willReturn(Future.successful(nics))
+      given(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics))).willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
 
-      val result: Result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("HAPPY_PATH_2")))
+      val result: Result = underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("HAPPY_PATH_2")).futureValue
 
-      status(result) shouldBe CREATED
-      verify(underTest.scenarioLoader).loadScenario("HAPPY_PATH_2")
-      verify(underTest.service).create("2234567890", "2015", nics)
+      status(Future(result)) shouldBe CREATED
+
     }
 
-    "default to Happy Path Scenario 1 when no scenario is specified in the request" in new Setup {
+    "default to Happy Path Scenario 1 when no scenario is specified in the request" in  {
 
-      given(underTest.scenarioLoader.loadScenario(anyString)).willReturn(Future.successful(nics))
-      given(underTest.service.create(anyString, anyString, any[NICs])).willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
+      given(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_1"))).willReturn(Future.successful(nics))
+      given(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics))).willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
 
-      val result: Result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(emptyRequest))
+      val result: Result = underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(emptyRequest).futureValue
 
-      status(result) shouldBe CREATED
-      verify(underTest.scenarioLoader).loadScenario("HAPPY_PATH_1")
-      verify(underTest.service).create("2234567890", "2015", nics)
+      status(Future(result)) shouldBe CREATED
+
     }
 
-    "return an invalid server error when the repository fails" in new Setup {
+    "return an invalid server error when the repository fails" in  {
 
-      given(underTest.scenarioLoader.loadScenario(anyString)).willReturn(Future.successful(nics))
-      given(underTest.service.create(anyString, anyString, any[NICs])).willReturn(Future.failed(new RuntimeException("expected test error")))
+      given(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_2"))).willReturn(Future.successful(nics))
+      given(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics))).willReturn(Future.failed(new RuntimeException("expected test error")))
 
-      val result: Result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("HAPPY_PATH_2")))
-
-      status(result) shouldBe INTERNAL_SERVER_ERROR
+      val result: Future[Result] = underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("HAPPY_PATH_2"))
+      status((result)) shouldBe INTERNAL_SERVER_ERROR
     }
 
-    "return a bad request when the scenario is invalid" in new Setup {
+    "return a bad request when the scenario is invalid" in {
 
-      given(underTest.scenarioLoader.loadScenario(anyString)).willReturn(Future.failed(new InvalidScenarioException("INVALID")))
+      given(underTest.scenarioLoader.loadScenario(argEq("INVALID"))).willReturn(Future.failed(new InvalidScenarioException("INVALID")))
 
-      val result: Result = await(underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("INVALID")))
+      val result: Future[Result] = underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(createSummaryRequest("INVALID"))
 
       status(result) shouldBe BAD_REQUEST
-      (jsonBodyOf(result) \ "code").as[String] shouldBe "UNKNOWN_SCENARIO"
+      (contentAsJson(result) \ "code").as[String] shouldBe "UNKNOWN_SCENARIO"
     }
   }
 }

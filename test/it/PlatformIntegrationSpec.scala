@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package it
 
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
@@ -34,7 +33,7 @@ import scala.concurrent.Future
   * available under api/documentation/[version]/[endpoint name] GET endpoint
   * Example: api/documentation/1.0/Fetch-Some-Data
   */
-class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutures with GuiceOneAppPerTest {
+class PlatformIntegrationSpec extends WordSpecLike with GuiceOneAppPerTest with OptionValues with Matchers {
 
   trait Setup {
     val documentationController: DocumentationController = app.injector.instanceOf[DocumentationController]
@@ -44,7 +43,7 @@ class PlatformIntegrationSpec extends UnitSpec with MockitoSugar with ScalaFutur
   "microservice" should {
 
     "provide definition endpoint" in new Setup {
-      val result: Future[Result] = documentationController.definition()(request)
+      val result: Future[Result] = documentationController.definition().apply(request)
       status(result) shouldBe 200
     }
 
