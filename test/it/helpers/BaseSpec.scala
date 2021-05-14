@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,6 @@ trait BaseSpec extends FeatureSpec with MongoSpecSupport with BeforeAndAfterAll 
     override val mongoConnector: MongoConnector = mongoConnectorForTest
   }
 
-  val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
+  implicit val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://localhost:$port"
 }
