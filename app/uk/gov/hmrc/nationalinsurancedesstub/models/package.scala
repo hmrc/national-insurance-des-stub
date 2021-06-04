@@ -16,17 +16,18 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json, OFormat}
+import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
 package object models {
-  implicit val formatObjectId = ReactiveMongoFormats.objectIdFormats
-  implicit val formatCreateSummaryRequest = Json.format[CreateSummaryRequest]
-  implicit val class1nicsFmt = Json.format[Class1NICs]
-  implicit val class2nicsFmt = Json.format[Class2NICs]
-  implicit val nicsFmt = Json.format[NICs]
-  implicit val formatNationalInsuranceSummary = Json.format[NationalInsuranceSummary]
+  implicit val formatObjectId: Format[BSONObjectID] = ReactiveMongoFormats.objectIdFormats
+  implicit val formatCreateSummaryRequest: OFormat[CreateSummaryRequest] = Json.format[CreateSummaryRequest]
+  implicit val class1nicsFmt: OFormat[Class1NICs] = Json.format[Class1NICs]
+  implicit val class2nicsFmt: OFormat[Class2NICs] = Json.format[Class2NICs]
+  implicit val nicsFmt: OFormat[NICs] = Json.format[NICs]
+  implicit val formatNationalInsuranceSummary: OFormat[NationalInsuranceSummary] = Json.format[NationalInsuranceSummary]
 
-  implicit val apiAccessFmt = Json.format[APIAccess]
+  implicit val apiAccessFmt: OFormat[APIAccess] = Json.format[APIAccess]
 
 }
