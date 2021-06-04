@@ -13,7 +13,7 @@ def unitFilter(name: String): Boolean = name startsWith "unit"
 def itTestFilter(name: String): Boolean = name startsWith "it"
 
 lazy val compile = Seq(
-  "uk.gov.hmrc" %% "bootstrap-backend-play-27" % "4.0.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-27" % "5.3.0",
   "uk.gov.hmrc" %% "play-hmrc-api" % "5.3.0-play-27",
   "uk.gov.hmrc" %% "simple-reactivemongo" % "7.31.0-play-27",
   "uk.gov.hmrc" %% "domain" % "5.11.0-play-27",
