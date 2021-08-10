@@ -13,22 +13,22 @@ def unitFilter(name: String): Boolean = name startsWith "unit"
 def itTestFilter(name: String): Boolean = name startsWith "it"
 
 lazy val compile = Seq(
-  "uk.gov.hmrc" %% "bootstrap-backend-play-27" % "5.3.0",
-  "uk.gov.hmrc" %% "play-hmrc-api" % "5.3.0-play-27",
-  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.31.0-play-27",
-  "uk.gov.hmrc" %% "domain" % "5.11.0-play-27",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.10.0",
+  "uk.gov.hmrc" %% "domain" % "6.2.0-play-28",
+  "uk.gov.hmrc" %% "play-hmrc-api" % "6.4.0-play-28",
+  "uk.gov.hmrc" %% "simple-reactivemongo" % "8.0.0-play-28",
   compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
   "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
 )
 
 def test(scope: String = "test, it") = Seq(
-  "uk.gov.hmrc" %% "reactivemongo-test" % "4.22.0-play-27" % scope,
+  "uk.gov.hmrc" %% "reactivemongo-test" % "5.0.0-play-28" % scope,
   "org.scalatest" %% "scalatest" % "3.0.9" % scope,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.0" % scope,
-  "org.mockito" % "mockito-core" % "2.10.0" % scope,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % scope,
+  "org.mockito" % "mockito-core" % "2.28.2" % scope,
   "org.pegdown" % "pegdown" % "1.6.0" % scope,
   "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-  "org.scalaj" %% "scalaj-http" % "2.3.0" % scope,
+  "org.scalaj" %% "scalaj-http" % "2.4.2" % scope,
   "com.github.tomakehurst" % "wiremock-jre8" % "2.26.3" % scope
 )
 
