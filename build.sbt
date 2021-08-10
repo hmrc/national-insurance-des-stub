@@ -14,22 +14,24 @@ def itTestFilter(name: String): Boolean = name startsWith "it"
 
 lazy val compile = Seq(
   "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.10.0",
-  "uk.gov.hmrc" %% "domain" % "6.2.0-play-28",
-  "uk.gov.hmrc" %% "play-hmrc-api" % "6.4.0-play-28",
-  "uk.gov.hmrc" %% "simple-reactivemongo" % "8.0.0-play-28",
+  "uk.gov.hmrc" %% "domain"                    % "6.2.0-play-28",
+  "uk.gov.hmrc" %% "play-hmrc-api"             % "6.4.0-play-28",
+  "uk.gov.hmrc" %% "simple-reactivemongo"      % "8.0.0-play-28",
   compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
   "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
 )
 
 def test(scope: String = "test, it") = Seq(
-  "uk.gov.hmrc" %% "reactivemongo-test" % "5.0.0-play-28" % scope,
-  "org.scalatest" %% "scalatest" % "3.0.9" % scope,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % scope,
-  "org.mockito" % "mockito-core" % "2.28.2" % scope,
-  "org.pegdown" % "pegdown" % "1.6.0" % scope,
-  "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-  "org.scalaj" %% "scalaj-http" % "2.4.2" % scope,
-  "com.github.tomakehurst" % "wiremock-jre8" % "2.26.3" % scope
+  "uk.gov.hmrc"            %% "reactivemongo-test" % "5.0.0-play-28" % scope,
+  "org.scalatest"          %% "scalatest"          % "3.0.9" % scope,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % scope,
+  "org.scalatestplus"      %% "mockito-3-4"        % "3.2.9.0",
+  "org.mockito"            %  "mockito-core"       % "3.11.0" % scope,
+  "org.pegdown"            %  "pegdown"            % "1.6.0" % scope,
+  "com.typesafe.play"      %% "play-test"          % PlayVersion.current % scope,
+  "org.scalaj"             %% "scalaj-http"        % "2.4.2" % scope,
+  "com.github.tomakehurst" %  "wiremock-jre8"      % "2.26.3" % scope,
+  "com.vladsch.flexmark"   %  "flexmark-all"       % "0.35.10",
 )
 
 defaultSettings()

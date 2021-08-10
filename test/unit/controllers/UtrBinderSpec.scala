@@ -16,11 +16,12 @@
 
 package unit.controllers
 
-import org.scalatest.{Matchers, WordSpec}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class UtrBinderSpec extends WordSpec with Matchers {
+class UtrBinderSpec extends AnyWordSpec with Matchers {
 
   "a valid utr '1097172564'" should {
     "be transformed to an SaUtr object" in {
