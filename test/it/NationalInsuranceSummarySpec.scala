@@ -45,9 +45,9 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
   val happyPath1FilePath = "/public/scenarios/HAPPY_PATH_1.json"
   val happyPath2FilePath = "/public/scenarios/HAPPY_PATH_2.json"
 
-  feature("Prime National Insurance summary") {
+  Feature("Prime National Insurance summary") {
 
-    scenario("400 BAD REQUEST is returned when UTR is invalid") {
+    Scenario("400 BAD REQUEST is returned when UTR is invalid") {
       When("I attempt to prime a National Insurance summary for an invalid UTR and valid tax year")
       val response = primeNationalInsuranceSummary(invalidUtr, validTaxYear, emptyPayload)
 
@@ -61,7 +61,7 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
       (Json.parse(response.body) \ "message").as[String] shouldBe "ERROR_SA_UTR_INVALID"
     }
 
-    scenario("400 BAD REQUEST is returned when tax year is invalid") {
+    Scenario("400 BAD REQUEST is returned when tax year is invalid") {
       When("I attempt to prime a National Insurance summary for a valid UTR and invalid tax year")
       val response = primeNationalInsuranceSummary(validUtr, invalidTaxYear, emptyPayload)
 
@@ -75,7 +75,7 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
       (Json.parse(response.body) \ "message").as[String] shouldBe "ERROR_TAX_YEAR_INVALID"
     }
 
-    scenario("National Insurance summary can be primed") {
+    Scenario("National Insurance summary can be primed") {
       When("I prime a National Insurance summary for a given UTR and tax year")
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath2Payload)
 
@@ -83,7 +83,7 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
       primeResponse.code shouldBe CREATED
     }
 
-    scenario("National Insurance summary cannot be primed with an invalid scenario") {
+    Scenario("National Insurance summary cannot be primed with an invalid scenario") {
       When("I attempt to prime a National Insurance summary with an invalid scenario")
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, invalidScenarioPayload)
 
@@ -96,9 +96,9 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
 
   }
 
-  feature("Fetch National Insurance summary") {
+  Feature("Fetch National Insurance summary") {
 
-    scenario("No data is returned because UTR and tax year are not found") {
+    Scenario("No data is returned because UTR and tax year are not found") {
       When("I request a National Insurance summary for a given UTR and tax year")
       val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
 
@@ -106,7 +106,7 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
       response.code shouldBe NOT_FOUND
     }
 
-    scenario("National Insurance summary is returned when primed with specific scenario") {
+    Scenario("National Insurance summary is returned when primed with specific scenario") {
       When("I prime a National Insurance summary for a given UTR and tax year")
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath2Payload)
 
@@ -124,7 +124,7 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
       Json.parse(response.body) shouldBe Json.parse(expected)
     }
 
-    scenario("Happy Path 1 National Insurance summary is returned when primed with default scenario") {
+    Scenario("Happy Path 1 National Insurance summary is returned when primed with default scenario") {
       When("I prime a National Insurance summary for a given UTR and tax year")
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, emptyPayload)
 
@@ -142,7 +142,7 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
       Json.parse(response.body) shouldBe Json.parse(expected)
     }
 
-    scenario("National Insurance summary can be re-primed with a different scenario") {
+    Scenario("National Insurance summary can be re-primed with a different scenario") {
       When("I prime a National Insurance summary for a given UTR and tax year")
       val initialPrimeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath1Payload)
 

@@ -32,7 +32,7 @@ object ErrorGenericBadRequest extends ErrorResponse(BAD_REQUEST, "ERROR_BAD_REQU
 object ErrorNotFound extends ErrorResponse(NOT_FOUND, "ERROR_NOT_FOUND")
 
 object ErrorResponse {
-  implicit val errorResponseWrites: Writes[ErrorResponse] = (e: ErrorResponse) =>
+  implicit def errorResponseWrites[T <: ErrorResponse]: Writes[T] = (e: ErrorResponse) =>
     Json.obj("statusCode" -> e.httpStatusCode, "message" -> e.message)
 
 }

@@ -20,7 +20,7 @@ import akka.stream.Materializer
 import org.mockito.ArgumentMatchers.{eq => argEq}
 import org.mockito.BDDMockito.given
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, OptionValues, WordSpec}
+import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
@@ -38,11 +38,13 @@ import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummarySe
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 
 
 
-class NationalInsuranceSummaryControllerSpec extends WordSpec with Matchers with OptionValues with MockitoSugar with GuiceOneServerPerSuite with ScalaFutures {
+class NationalInsuranceSummaryControllerSpec extends AnyWordSpec with Matchers with OptionValues with MockitoSugar with GuiceOneServerPerSuite with ScalaFutures {
 
   override lazy val fakeApplication: Application = GuiceApplicationBuilder(
     disabled = Seq(classOf[com.kenshoo.play.metrics.PlayModule])

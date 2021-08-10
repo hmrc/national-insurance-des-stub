@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub
 
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.Results.Status
@@ -26,11 +25,12 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.backend.http.JsonErrorHandler
 import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ErrorHandler @Inject()(configuration: Configuration,
-                            auditEvent: HttpAuditEvent,
+                             auditEvent: HttpAuditEvent,
                              auditConnector: AuditConnector
                             )(implicit ec: ExecutionContext) extends JsonErrorHandler(auditConnector, auditEvent, configuration) {
 
