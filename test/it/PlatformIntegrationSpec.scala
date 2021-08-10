@@ -16,7 +16,7 @@
 
 package it
 
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import org.scalatest.OptionValues
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
@@ -24,6 +24,8 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
 
 import scala.concurrent.Future
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 
 /**
   * Testcase to verify the capability of integration with the API platform.
@@ -33,7 +35,7 @@ import scala.concurrent.Future
   * available under api/documentation/[version]/[endpoint name] GET endpoint
   * Example: api/documentation/1.0/Fetch-Some-Data
   */
-class PlatformIntegrationSpec extends WordSpecLike with GuiceOneAppPerTest with OptionValues with Matchers {
+class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest with OptionValues with Matchers {
 
   trait Setup {
     val documentationController: DocumentationController = app.injector.instanceOf[DocumentationController]

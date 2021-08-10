@@ -16,11 +16,12 @@
 
 package unit.controllers
 
-import org.scalatest.{Matchers, WordSpec}
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.Binders
 import uk.gov.hmrc.nationalinsurancedesstub.models.TaxYear
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class TaxYearBinderSpec extends WordSpec with Matchers {
+class TaxYearBinderSpec extends AnyWordSpec with Matchers {
 
   "a valid tax year '2014-15'" should {
     "be transformed to an TaxYear object" in {
