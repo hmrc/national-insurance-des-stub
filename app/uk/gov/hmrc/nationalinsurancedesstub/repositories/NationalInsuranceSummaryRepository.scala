@@ -16,29 +16,31 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.repositories
 
-import play.api.libs.json.{JsObject, Json}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.bson.BSONObjectID
-import uk.gov.hmrc.mongo.ReactiveRepository
+
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.nationalinsurancedesstub.models._
+import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.FindOneAndReplaceOptions
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NationalInsuranceSummaryRepository @Inject()(mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
-  extends ReactiveRepository[NationalInsuranceSummary, BSONObjectID]("national-insurance-summary", mongo.mongoConnector.db,
-    formatNationalInsuranceSummary, formatObjectId) {
+class NationalInsuranceSummaryRepository @Inject()(mongo: MongoComponent)(implicit ec: ExecutionContext)
+  extends PlayMongoRepository[NationalInsuranceSummary](
+    mongoComponent = mongo,
+    collectionName = "national-insurance-summary",
+    domainFormat = formatNationalInsuranceSummary,
+    indexes = Seq.empty
+  ) {
 
   def store(nationalInsuranceSummary: NationalInsuranceSummary): Future[NationalInsuranceSummary] = {
-    findAndUpdate(
-      Json.obj("utr" -> nationalInsuranceSummary.utr, "taxYear" -> nationalInsuranceSummary.taxYear),
-      Json.toJson(nationalInsuranceSummary)(formatNationalInsuranceSummary).as[JsObject],
-      fetchNewObject = false,
-      upsert = true).map(_ => nationalInsuranceSummary)
+
+    collection.findOneAndReplace(and(equal("utr" , nationalInsuranceSummary.utr), equal("taxYear" , nationalInsuranceSummary.taxYear)),
+      nationalInsuranceSummary, FindOneAndReplaceOptions().upsert(true)).toFuture()
   }
 
   def fetch(utr: String, taxYear: String): Future[Option[NationalInsuranceSummary]] = {
-    find("utr" -> utr, "taxYear" -> taxYear) map (_.headOption)
-  }
+    collection.find(and(equal("utr" , utr), equal("taxYear" , taxYear))).headOption()  }
 }

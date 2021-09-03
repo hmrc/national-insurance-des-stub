@@ -13,16 +13,16 @@ def unitFilter(name: String): Boolean = name startsWith "unit"
 def itTestFilter(name: String): Boolean = name startsWith "it"
 
 lazy val compile = Seq(
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.10.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.12.0",
   "uk.gov.hmrc" %% "domain"                    % "6.2.0-play-28",
   "uk.gov.hmrc" %% "play-hmrc-api"             % "6.4.0-play-28",
-  "uk.gov.hmrc" %% "simple-reactivemongo"      % "8.0.0-play-28",
+  "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"  % "0.53.0",
   compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
   "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
 )
 
 def test(scope: String = "test, it") = Seq(
-  "uk.gov.hmrc"            %% "reactivemongo-test" % "5.0.0-play-28" % scope,
+  "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28" % "0.53.0" % scope,
   "org.scalatest"          %% "scalatest"          % "3.0.9" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % scope,
   "org.scalatestplus"      %% "mockito-3-4"        % "3.2.9.0",
@@ -66,7 +66,7 @@ unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTe
 libraryDependencies ++= appDependencies
 
 // Coverage configuration
-coverageMinimum := 86
+coverageMinimum := 82
 coverageFailOnMinimum := true
 coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"
 
