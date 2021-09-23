@@ -17,19 +17,17 @@
 package it.helpers
 
 import java.util.concurrent.TimeUnit
-
 import org.scalatest._
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.modules.reactivemongo.ReactiveMongoComponent
-import uk.gov.hmrc.mongo.{MongoConnector, MongoSpecSupport}
 
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
+import uk.gov.hmrc.mongo.test.MongoSupport
 
-trait BaseSpec extends AnyFeatureSpec with MongoSpecSupport with BeforeAndAfterAll with BeforeAndAfterEach with Matchers
+trait BaseSpec extends AnyFeatureSpec with MongoSupport with BeforeAndAfterAll with BeforeAndAfterEach with Matchers
   with GuiceOneServerPerSuite with GivenWhenThen {
 
 
@@ -39,10 +37,6 @@ trait BaseSpec extends AnyFeatureSpec with MongoSpecSupport with BeforeAndAfterA
     "mongodb.uri" -> mongoUri,
     "run.mode" -> "It"
   ).build()
-
-  val reactiveMongoComponent: ReactiveMongoComponent = new ReactiveMongoComponent {
-    override val mongoConnector: MongoConnector = mongoConnectorForTest
-  }
 
   implicit val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://localhost:$port"

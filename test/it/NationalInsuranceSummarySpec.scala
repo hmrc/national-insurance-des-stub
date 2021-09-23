@@ -22,13 +22,10 @@ import play.api.http.HeaderNames
 import play.api.http.Status.{BAD_REQUEST, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.Json
 import scalaj.http.Http
-import uk.gov.hmrc.mongo.MongoSpecSupport
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
-
 import scala.concurrent.Await.result
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
+class NationalInsuranceSummarySpec extends BaseSpec{
 
   private val validUtr = "2234567890"
   private val invalidUtr = "INVALID"
@@ -186,7 +183,7 @@ class NationalInsuranceSummarySpec extends BaseSpec with MongoSpecSupport {
 
   override protected def beforeEach(): Unit = {
     val repository = app.injector.instanceOf[NationalInsuranceSummaryRepository]
-    result(repository.drop, timeout)
+    result(repository.collection.drop().toFuture(), timeout)
     result(repository.ensureIndexes, timeout)
   }
 }
