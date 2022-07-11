@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,13 @@ class TaxYearBinderSpec extends AnyWordSpec with Matchers {
     "be transformed to an TaxYear object" in {
       val ty = "2014-15"
       Binders.taxYearBinder.bind("taxYear", ty) shouldBe Right(TaxYear("2014-15"))
+    }
+  }
+
+  "unbinding a TaxYear object" should {
+    "result in a taxYear" in {
+      val taxYear = "2020-21"
+      Binders.taxYearBinder.unbind("taxYear", TaxYear(taxYear)) shouldBe taxYear
     }
   }
 

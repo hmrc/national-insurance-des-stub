@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,21 @@ class UtrBinderSpec extends AnyWordSpec with Matchers {
   "a valid utr '1097172564'" should {
     "be transformed to an SaUtr object" in {
       val utr = "1097172564"
-      Binders.saUtrBinder.bind("utr",utr) shouldBe Right(SaUtr(utr))
+      Binders.saUtrBinder.bind("utr", utr) shouldBe Right(SaUtr(utr))
+    }
+  }
+
+  "unbinding a SaUtr object" should {
+    "result in a utr" in {
+      val utr = "1097172564"
+      Binders.saUtrBinder.unbind("utr", SaUtr(utr)) shouldBe utr
     }
   }
 
   "an invalid utr 'invalid'" should {
     "be transformed to a String error message" in {
       val utr = "invalid"
-      Binders.saUtrBinder.bind("utr",utr) shouldBe Left("ERROR_SA_UTR_INVALID")
+      Binders.saUtrBinder.bind("utr", utr) shouldBe Left("ERROR_SA_UTR_INVALID")
     }
   }
 
