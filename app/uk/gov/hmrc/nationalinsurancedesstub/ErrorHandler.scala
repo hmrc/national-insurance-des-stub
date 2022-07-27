@@ -29,17 +29,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ErrorHandler @Inject()(configuration: Configuration,
-                             auditEvent: HttpAuditEvent,
-                             auditConnector: AuditConnector
-                            )(implicit ec: ExecutionContext) extends JsonErrorHandler(auditConnector, auditEvent, configuration) {
+class ErrorHandler @Inject() (configuration: Configuration, auditEvent: HttpAuditEvent, auditConnector: AuditConnector)(
+  implicit ec: ExecutionContext
+) extends JsonErrorHandler(auditConnector, auditEvent, configuration) {
 
-  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] =
     if (statusCode == play.api.http.Status.BAD_REQUEST) {
       val errorScenario = message match {
         case "ERROR_TAX_YEAR_INVALID" => ErrorTaxYearInvalid
-        case "ERROR_SA_UTR_INVALID" => ErrorSaUtrInvalid
-        case _ => ErrorGenericBadRequest
+        case "ERROR_SA_UTR_INVALID"   => ErrorSaUtrInvalid
+        case _                        => ErrorGenericBadRequest
       }
       Future.successful(Status(ErrorGenericBadRequest.httpStatusCode)(Json.toJson(errorScenario)))
     } else if (statusCode == play.api.http.Status.NOT_FOUND) {
@@ -47,5 +46,4 @@ class ErrorHandler @Inject()(configuration: Configuration,
     } else {
       Future.successful(Status(statusCode)(message))
     }
-  }
 }

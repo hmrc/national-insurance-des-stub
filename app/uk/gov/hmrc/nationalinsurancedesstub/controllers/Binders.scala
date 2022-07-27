@@ -27,25 +27,24 @@ object Binders {
 
     def unbind(key: String, saUtr: SaUtr): String = stringBinder.unbind(key, saUtr.value)
 
-    def bind(key: String, value: String): Either[String, SaUtr] = {
+    def bind(key: String, value: String): Either[String, SaUtr] =
       if (SelfAssessmentReferenceChecker.isValid(value)) {
         Right(SaUtr(value))
       } else {
         Left("ERROR_SA_UTR_INVALID")
       }
-    }
   }
 
-  implicit def taxYearBinder(implicit stringBinder: PathBindable[String]): PathBindable[TaxYear] = new PathBindable[TaxYear] {
+  implicit def taxYearBinder(implicit stringBinder: PathBindable[String]): PathBindable[TaxYear] =
+    new PathBindable[TaxYear] {
 
-    override def unbind(key: String, taxYear: TaxYear): String = stringBinder.unbind(key, taxYear.ty)
+      override def unbind(key: String, taxYear: TaxYear): String = stringBinder.unbind(key, taxYear.ty)
 
-    override def bind(key: String, value: String): Either[String, TaxYear] = {
-      if (TaxYear.isValid(value)) {
-        Right(TaxYear(value))
-      } else {
-        Left("ERROR_TAX_YEAR_INVALID")
-      }
+      override def bind(key: String, value: String): Either[String, TaxYear] =
+        if (TaxYear.isValid(value)) {
+          Right(TaxYear(value))
+        } else {
+          Left("ERROR_TAX_YEAR_INVALID")
+        }
     }
-  }
 }

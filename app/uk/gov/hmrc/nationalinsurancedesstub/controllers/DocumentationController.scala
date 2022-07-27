@@ -25,10 +25,8 @@ import uk.gov.hmrc.nationalinsurancedesstub.views.txt
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 @Singleton
-class DocumentationController @Inject()(appContext: AppContext,
-    assets: Assets,
-    val cc: ControllerComponents)
-  extends BackendController(cc) {
+class DocumentationController @Inject() (appContext: AppContext, assets: Assets, val cc: ControllerComponents)
+    extends BackendController(cc) {
 
   def definition: Action[AnyContent] = Action {
     Ok(txt.definition(APIAccess.build(appContext.access))).withHeaders(CONTENT_TYPE -> JSON)

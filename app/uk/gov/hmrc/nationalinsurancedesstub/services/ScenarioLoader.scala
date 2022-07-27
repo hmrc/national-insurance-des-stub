@@ -26,9 +26,8 @@ import scala.concurrent.Future
 @Singleton
 class ScenarioLoader {
 
-  private def pathForScenario(scenario: String) = {
+  private def pathForScenario(scenario: String) =
     s"/public/scenarios/$scenario.json"
-  }
 
   def loadScenario(scenario: String): Future[NICs] = {
     val resource = getClass.getResourceAsStream(pathForScenario(scenario))
