@@ -28,35 +28,38 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class NationalInsuranceSummaryController @Inject()(val scenarioLoader: ScenarioLoader,
-    val service: NationalInsuranceSummaryService,
-    val cc: ControllerComponents)
-  extends BackendController(cc) with HeaderValidator {
+class NationalInsuranceSummaryController @Inject() (
+  val scenarioLoader: ScenarioLoader,
+  val service: NationalInsuranceSummaryService,
+  val cc: ControllerComponents
+) extends BackendController(cc)
+    with HeaderValidator {
 
   implicit val executionContext: ExecutionContext = cc.executionContext
-  val parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
+  val parser: BodyParser[AnyContent]              = cc.parsers.defaultBodyParser
 
   def fetch(utr: String, taxEndYear: String): Action[AnyContent] = Action.async {
     service.fetch(utr, taxEndYear) map {
       case Some(result) => Ok(Json.toJson(result.nics))
-      case _ => NotFound
-    } recover {
-      case _ => InternalServerError
+      case _            => NotFound
+    } recover { case _ =>
+      InternalServerError
     }
   }
 
-  def create(saUtr: SaUtr, taxYear: TaxYear): Action[JsValue] = validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
-    withJsonBody[CreateSummaryRequest] { createSummaryRequest =>
-      val scenario = createSummaryRequest.scenario.getOrElse("HAPPY_PATH_1")
+  def create(saUtr: SaUtr, taxYear: TaxYear): Action[JsValue] =
+    validateAccept(acceptHeaderValidationRules).async(parse.json) { implicit request =>
+      withJsonBody[CreateSummaryRequest] { createSummaryRequest =>
+        val scenario = createSummaryRequest.scenario.getOrElse("HAPPY_PATH_1")
 
-      for {
-        nics <- scenarioLoader.loadScenario(scenario)
-        _ <- service.create(saUtr.utr, taxYear.endYr, nics)
-      } yield Created(Json.toJson(nics))
+        for {
+          nics <- scenarioLoader.loadScenario(scenario)
+          _    <- service.create(saUtr.utr, taxYear.endYr, nics)
+        } yield Created(Json.toJson(nics))
 
-    } recover {
-      case _: InvalidScenarioException => BadRequest(JsonErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))
-      case _ => InternalServerError
+      } recover {
+        case _: InvalidScenarioException => BadRequest(JsonErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))
+        case _                           => InternalServerError
+      }
     }
-  }
 }

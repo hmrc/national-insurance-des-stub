@@ -20,10 +20,10 @@ import scala.util.matching.Regex
 import scala.util.matching.Regex.Match
 
 case class TaxYear(ty: String) {
-  if(!TaxYear.isValid(ty)) throw new IllegalArgumentException
+  if (!TaxYear.isValid(ty)) throw new IllegalArgumentException
 
   val startYr: String = ty.split("-")(0)
-  val endYr: String = (startYr.toInt + 1).toString
+  val endYr: String   = (startYr.toInt + 1).toString
 }
 
 object TaxYear {
@@ -32,7 +32,7 @@ object TaxYear {
 
   val matchTaxYear: String => Option[Match] = new Regex(TaxYear.TaxYearRegex, "first", "second") findFirstMatchIn _
 
-  def isValid(taxYearReference: String): Boolean = matchTaxYear(taxYearReference) exists {
-    r => (r.group("first").toInt + 1) % 100 == r.group("second").toInt
+  def isValid(taxYearReference: String): Boolean = matchTaxYear(taxYearReference) exists { r =>
+    (r.group("first").toInt + 1) % 100 == r.group("second").toInt
   }
 }

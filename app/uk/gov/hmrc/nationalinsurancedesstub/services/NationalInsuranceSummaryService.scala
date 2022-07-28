@@ -23,13 +23,11 @@ import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummar
 import scala.concurrent.Future
 
 @Singleton
-class NationalInsuranceSummaryService @Inject()(val repository: NationalInsuranceSummaryRepository) {
+class NationalInsuranceSummaryService @Inject() (val repository: NationalInsuranceSummaryRepository) {
 
-  def create(utr: String, taxYearEnd: String, nics: NICs): Future[NationalInsuranceSummary] = {
+  def create(utr: String, taxYearEnd: String, nics: NICs): Future[NationalInsuranceSummary] =
     repository.store(NationalInsuranceSummary(utr, taxYearEnd, nics))
-  }
 
-  def fetch(utr: String, taxYearEnd: String): Future[Option[NationalInsuranceSummary]] = {
+  def fetch(utr: String, taxYearEnd: String): Future[Option[NationalInsuranceSummary]] =
     repository.fetch(utr, taxYearEnd)
-  }
 }

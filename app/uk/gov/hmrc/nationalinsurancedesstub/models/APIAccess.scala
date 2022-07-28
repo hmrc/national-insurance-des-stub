@@ -23,6 +23,8 @@ case class APIAccess(`type`: String, whitelistedApplicationIds: Option[Seq[Strin
 object APIAccess {
   def build(config: Option[Configuration])(version: String): APIAccess = APIAccess(
     `type` = config.flatMap(_.getOptional[String](s"version-$version.type")).getOrElse("PRIVATE"),
-    whitelistedApplicationIds = config.foldLeft[Option[Seq[String]]](None){(_, conf) =>
-      conf.getOptional[Seq[String]](s"version-$version.whitelistedApplicationIds")})
+    whitelistedApplicationIds = config.foldLeft[Option[Seq[String]]](None) { (_, conf) =>
+      conf.getOptional[Seq[String]](s"version-$version.whitelistedApplicationIds")
+    }
+  )
 }

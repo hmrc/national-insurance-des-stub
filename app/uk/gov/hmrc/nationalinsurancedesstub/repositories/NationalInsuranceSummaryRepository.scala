@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.repositories
 
-
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.nationalinsurancedesstub.models._
@@ -27,20 +26,23 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NationalInsuranceSummaryRepository @Inject()(mongo: MongoComponent)(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[NationalInsuranceSummary](
-    mongoComponent = mongo,
-    collectionName = "national-insurance-summary",
-    domainFormat = formatNationalInsuranceSummary,
-    indexes = Seq.empty
-  ) {
+class NationalInsuranceSummaryRepository @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[NationalInsuranceSummary](
+      mongoComponent = mongo,
+      collectionName = "national-insurance-summary",
+      domainFormat = formatNationalInsuranceSummary,
+      indexes = Seq.empty
+    ) {
 
-  def store(nationalInsuranceSummary: NationalInsuranceSummary): Future[NationalInsuranceSummary] = {
+  def store(nationalInsuranceSummary: NationalInsuranceSummary): Future[NationalInsuranceSummary] =
+    collection
+      .findOneAndReplace(
+        and(equal("utr", nationalInsuranceSummary.utr), equal("taxYear", nationalInsuranceSummary.taxYear)),
+        nationalInsuranceSummary,
+        FindOneAndReplaceOptions().upsert(true)
+      )
+      .toFuture()
 
-    collection.findOneAndReplace(and(equal("utr" , nationalInsuranceSummary.utr), equal("taxYear" , nationalInsuranceSummary.taxYear)),
-      nationalInsuranceSummary, FindOneAndReplaceOptions().upsert(true)).toFuture()
-  }
-
-  def fetch(utr: String, taxYear: String): Future[Option[NationalInsuranceSummary]] = {
-    collection.find(and(equal("utr" , utr), equal("taxYear" , taxYear))).headOption()  }
+  def fetch(utr: String, taxYear: String): Future[Option[NationalInsuranceSummary]] =
+    collection.find(and(equal("utr", utr), equal("taxYear", taxYear))).headOption()
 }

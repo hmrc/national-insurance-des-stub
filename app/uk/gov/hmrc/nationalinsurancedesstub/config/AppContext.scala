@@ -20,6 +20,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 
 @Singleton
-class AppContext @Inject()(configuration: Configuration) {
+class AppContext @Inject() (configuration: Configuration) {
   lazy val access: Option[Configuration] = configuration.getOptional[Configuration](s"api.access")
 }

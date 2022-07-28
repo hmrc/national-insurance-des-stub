@@ -8,7 +8,7 @@ lazy val appName = "national-insurance-des-stub"
 
 val silencerVersion = "1.7.9"
 val bootstrapPlayVersion = "6.2.0"
-val hmrcMongoPlayVersion = "0.66.0"
+val hmrcMongoPlayVersion = "0.68.0"
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 
