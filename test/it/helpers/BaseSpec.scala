@@ -44,7 +44,8 @@ trait BaseSpec
       "run.mode"               -> "It"
     )
     .build()
-
+  // scalastyle:off magic.number
   implicit val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
+  // scalastyle:on magic.number
   val serviceUrl                       = s"http://localhost:$port"
 }

@@ -72,8 +72,9 @@ class NationalInsuranceSummaryControllerSpec
 
   def emptyRequest: FakeRequest[JsValue] =
     request(Json.parse("{}"))
-
+  // scalastyle:off magic.number
   val nics = NICs(Class1NICs(10), Class2NICs(20), maxNICsReached = false)
+  // scalastyle:on magic.number
 
   "fetch" should {
 
