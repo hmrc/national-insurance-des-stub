@@ -27,12 +27,15 @@ class APIAccessSpec extends AnyWordSpec with Matchers {
 
     val version: String = "1.0"
 
-    val configuration: Configuration = Configuration.from(Map(
-      s"version-$version.type" -> "PUBLIC",
-      s"version-$version.whitelistedApplicationIds" -> Seq(
-        "a1e8057e-fbbc-47a8-a8b4-78d9f015c253", "f2fb30e5-4ab6-4a29-b3c1-c7264259ff1c"
+    val configuration: Configuration = Configuration.from(
+      Map(
+        s"version-$version.type"                      -> "PUBLIC",
+        s"version-$version.whitelistedApplicationIds" -> Seq(
+          "a1e8057e-fbbc-47a8-a8b4-78d9f015c253",
+          "f2fb30e5-4ab6-4a29-b3c1-c7264259ff1c"
+        )
       )
-    ))
+    )
 
     val apiAccess: APIAccess = APIAccess.build(Option(configuration))(version)
   }

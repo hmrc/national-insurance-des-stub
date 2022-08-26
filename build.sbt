@@ -1,39 +1,12 @@
 import _root_.play.sbt.routes.RoutesKeys.routesImport
-import play.core.PlayVersion
 import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
 lazy val appName = "national-insurance-des-stub"
 
-val silencerVersion = "1.7.9"
-val bootstrapPlayVersion = "6.2.0"
-val hmrcMongoPlayVersion = "0.68.0"
-
-lazy val appDependencies: Seq[ModuleID] = compile ++ test()
-
-def unitFilter(name: String): Boolean = name startsWith "unit"
+def unitFilter(name: String): Boolean   = name startsWith "unit"
 def itTestFilter(name: String): Boolean = name startsWith "it"
-
-lazy val compile = Seq(
-  "uk.gov.hmrc"                  %% "bootstrap-backend-play-28" % bootstrapPlayVersion,
-  "uk.gov.hmrc"                  %% "domain"                    % "8.1.0-play-28",
-  "uk.gov.hmrc"                  %% "play-hmrc-api"             % "7.0.0-play-28",
-  "uk.gov.hmrc.mongo"            %% "hmrc-mongo-play-28"        % hmrcMongoPlayVersion,
-  "org.scalaj"                   %% "scalaj-http"               % "2.4.2",
-  "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.13.3",
-  compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-  "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-)
-
-def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28" % hmrcMongoPlayVersion,
-  "org.scalatest"          %% "scalatest"               % "3.2.12",
-  "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % bootstrapPlayVersion,
-  "org.scalatestplus"      %% "mockito-4-5"             % "3.2.12.0",
-  "com.typesafe.play"      %% "play-test"               % PlayVersion.current,
-  "com.vladsch.flexmark"   %  "flexmark-all"            % "0.62.2"
-).map(_ % scope)
 
 defaultSettings()
 
@@ -62,9 +35,9 @@ update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaV
 Test / javaOptions += "-Dconfig.resource=test.application.conf"
 Test / fork := true
 IntegrationTest / testOptions := Seq(Tests.Filter(itTestFilter), Tests.Argument("-eT"))
-IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory) (base => Seq(base / "test")).value
+IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "test")).value
 
-libraryDependencies ++= appDependencies
+libraryDependencies ++= AppDependencies()
 
 // Coverage configuration
 coverageMinimumStmtTotal := 95
@@ -76,3 +49,6 @@ scalacOptions ++= Seq(
 )
 
 Global / excludeLintKeys += update / evictionWarningOptions
+
+addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt test:scalafmt")
+addCommandAlias("scalastyleAll", "all scalastyle test:scalastyle")

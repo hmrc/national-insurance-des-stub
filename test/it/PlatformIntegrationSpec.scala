@@ -39,7 +39,7 @@ class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest wi
 
   trait Setup {
     val documentationController: DocumentationController = app.injector.instanceOf[DocumentationController]
-    val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+    val request: FakeRequest[AnyContentAsEmpty.type]     = FakeRequest()
   }
 
   "microservice" should {
