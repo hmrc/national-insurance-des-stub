@@ -22,40 +22,36 @@ import uk.gov.hmrc.nationalinsurancedesstub.models.TaxYear
 
 class TaxYearSpec extends AnyWordSpec with Matchers {
 
-  private val validTaxYears = Seq("2019-20", "2020-21", "2021-22", "2022-23", "2023-24")
+  private val validTaxYears   = Seq("2019-20", "2020-21", "2021-22", "2022-23", "2023-24")
   private val invalidTaxYears = Seq("2019", "201920", "2019-19", "2019-21", "2019-1P")
 
   "isValid" should {
-    validTaxYears.foreach {
-      taxYear =>
-        s"return true for valid tax year $taxYear" in {
-          TaxYear.isValid(taxYear) shouldBe true
-        }
+    validTaxYears.foreach { taxYear =>
+      s"return true for valid tax year $taxYear" in {
+        TaxYear.isValid(taxYear) shouldBe true
+      }
     }
 
-    invalidTaxYears.foreach {
-      taxYear =>
-        s"return false for invalid tax year $taxYear" in {
-          TaxYear.isValid(taxYear) shouldBe false
-        }
+    invalidTaxYears.foreach { taxYear =>
+      s"return false for invalid tax year $taxYear" in {
+        TaxYear.isValid(taxYear) shouldBe false
+      }
     }
   }
 
   "TaxYear constructor" should {
-    validTaxYears.foreach {
-      taxYear =>
-        s"create a taxYear for a valid argument $taxYear" in {
-          TaxYear(taxYear).ty shouldBe taxYear
-        }
+    validTaxYears.foreach { taxYear =>
+      s"create a taxYear for a valid argument $taxYear" in {
+        TaxYear(taxYear).ty shouldBe taxYear
+      }
     }
 
-    invalidTaxYears.foreach {
-      taxYear =>
-        s"throw an IllegalArgumentException for an invalid argument $taxYear" in {
-          assertThrows[IllegalArgumentException](
-            TaxYear(taxYear)
-          )
-        }
+    invalidTaxYears.foreach { taxYear =>
+      s"throw an IllegalArgumentException for an invalid argument $taxYear" in {
+        assertThrows[IllegalArgumentException](
+          TaxYear(taxYear)
+        )
+      }
     }
   }
 }

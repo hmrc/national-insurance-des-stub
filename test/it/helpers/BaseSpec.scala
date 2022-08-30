@@ -27,17 +27,24 @@ import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.mongo.test.MongoSupport
 
-trait BaseSpec extends AnyFeatureSpec with MongoSupport with BeforeAndAfterAll with BeforeAndAfterEach with Matchers
-  with GuiceOneServerPerSuite with GivenWhenThen {
+trait BaseSpec
+    extends AnyFeatureSpec
+    with MongoSupport
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
+    with Matchers
+    with GuiceOneServerPerSuite
+    with GivenWhenThen {
 
-
-  implicit override lazy val app: Application = GuiceApplicationBuilder().configure(
-    "auditing.enabled" -> false,
-    "auditing.traceRequests" -> false,
-    "mongodb.uri" -> mongoUri,
-    "run.mode" -> "It"
-  ).build()
-
-  implicit val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
-  val serviceUrl = s"http://localhost:$port"
+  implicit override lazy val app: Application = GuiceApplicationBuilder()
+    .configure(
+      "auditing.enabled"       -> false,
+      "auditing.traceRequests" -> false,
+      "mongodb.uri"            -> mongoUri,
+      "run.mode"               -> "It"
+    )
+    .build()
+  val timeoutInSeconds = 5
+  implicit val timeout: FiniteDuration        = Duration(timeoutInSeconds, TimeUnit.SECONDS)
+  val serviceUrl                              = s"http://localhost:$port"
 }

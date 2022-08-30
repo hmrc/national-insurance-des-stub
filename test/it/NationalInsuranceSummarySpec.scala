@@ -25,18 +25,18 @@ import scalaj.http.Http
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
 import scala.concurrent.Await.result
 
-class NationalInsuranceSummarySpec extends BaseSpec{
+class NationalInsuranceSummarySpec extends BaseSpec {
 
-  private val validUtr = "2234567890"
+  private val validUtr   = "2234567890"
   private val invalidUtr = "INVALID"
 
-  private val validTaxYear = "2014-15"
-  private val invalidTaxYear = "15"
+  private val validTaxYear    = "2014-15"
+  private val invalidTaxYear  = "15"
   private val validTaxYearEnd = "2015"
 
-  private val emptyPayload = "{}"
-  private val happyPath1Payload = """{ "scenario": "HAPPY_PATH_1" }"""
-  private val happyPath2Payload = """{ "scenario": "HAPPY_PATH_2" }"""
+  private val emptyPayload           = "{}"
+  private val happyPath1Payload      = """{ "scenario": "HAPPY_PATH_1" }"""
+  private val happyPath2Payload      = """{ "scenario": "HAPPY_PATH_2" }"""
   private val invalidScenarioPayload = """{ "scenario": "NON_EXISTENT" }"""
 
   val happyPath1FilePath = "/public/scenarios/HAPPY_PATH_1.json"
