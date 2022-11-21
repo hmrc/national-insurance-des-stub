@@ -44,7 +44,7 @@ trait BaseSpec
       "run.mode"               -> "It"
     )
     .build()
-  val timeoutInSeconds = 5
+  val timeoutInSeconds                        = 5
   implicit val timeout: FiniteDuration        = Duration(timeoutInSeconds, TimeUnit.SECONDS)
   val serviceUrl                              = s"http://localhost:$port"
 }
