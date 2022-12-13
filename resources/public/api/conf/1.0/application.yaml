@@ -1,0 +1,151 @@
+openapi: 3.0.0
+info:
+  title: National Insurance Test Support
+  contact: {}
+  version: '1.0'
+servers:
+- url: https://api.service.hmrc.gov.uk/
+  variables: {}
+paths:
+  /national-insurance-test-support/sa/{utr}/annual-summary/{taxYear}:
+    post:
+      tags:
+      - national-insurance-test-support
+      summary: Create National Insurance summary test data
+      description: Lets you create National Insurance contributions test data
+      operationId: CreateNationalInsurancesummarytestdata
+      parameters:
+      - name: utr
+        in: path
+        description: The 10 digit self-assessment UTR for the individual.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: '2234567890'
+      - name: taxYear
+        in: path
+        description: The tax year for the National Insurance contribution being created.
+        required: true
+        style: simple
+        schema:
+          pattern: ^[0-9]{4}-[0-9]{2}$
+          type: string
+          example: 2016-17
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/NationalInsuranceTestSupportSaAnnualSummaryrequest'
+              - example:
+                  scenario: HAPPY_PATH_1
+            example:
+              scenario: HAPPY_PATH_1
+        required: true
+      responses:
+        '201':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/NationalInsuranceTestSupportSaAnnualSummaryresponse'
+                - example:
+                    class1:
+                      totalNICableEarnings: 10
+                    class2:
+                      totalDue: 20
+                    maxNICsReached: false
+              examples:
+                example-1:
+                  description: Example response for scenario HAPPY_PATH_1
+                  value:
+                    class1:
+                      totalNICableEarnings: 10
+                    class2:
+                      totalDue: 20
+                    maxNICsReached: false
+                example-2:
+                  description: Example response for scenario HAPPY_PATH_2
+                  value:
+                    class1:
+                      totalNICableEarnings: 17
+                    class2:
+                      totalDue: 319.57
+                    maxNICsReached: true
+      deprecated: false
+components:
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+    Class1:
+      title: Class1
+      required:
+      - totalNICableEarnings
+      type: object
+      properties:
+        totalNICableEarnings:
+          type: number
+          description: Total Class 1 earnings subject to National Insurance contributions between the Primary Threshold and the Upper Earnings Limit
+          example: 10
+    Class2:
+      title: Class2
+      required:
+      - totalDue
+      type: object
+      properties:
+        totalDue:
+          type: number
+          description: Total Class 2 National Insurance contributions due
+          example: 10
+    NationalInsuranceTestSupportSaAnnualSummaryrequest:
+      title: NationalInsuranceTestSupportSaAnnualSummaryrequest
+      type: object
+      properties:
+        scenario:
+          oneOf:
+          - $ref: '#/components/schemas/Scenario'
+          - $ref: '#/components/schemas/Scenario1'
+          description: The scenario to create test data for
+      description: Create National Insurance summary test data request
+    NationalInsuranceTestSupportSaAnnualSummaryresponse:
+      title: NationalInsuranceTestSupportSaAnnualSummaryresponse
+      required:
+      - class1
+      - class2
+      - maxNICsReached
+      type: object
+      properties:
+        class1:
+          $ref: '#/components/schemas/Class1'
+        class2:
+          $ref: '#/components/schemas/Class2'
+        maxNICsReached:
+          type: boolean
+          description: A flag indicating whether the maximum National Insurance contributions has been reached
+          example: false
+      description: Create National Insurance summary test data response
+    Scenario:
+      title: Scenario
+      enum:
+      - HAPPY_PATH_1
+      type: string
+      description: Standard happy path test scenario (default)
+    Scenario1:
+      title: Scenario1
+      enum:
+      - HAPPY_PATH_2
+      type: string
+      description: Happy path test scenario with different values
+tags:
+- name: national-insurance-test-support
+  description: ''

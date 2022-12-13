@@ -45,7 +45,8 @@ coverageFailOnMinimum := true
 coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"
 
 scalacOptions ++= Seq(
-  "-P:silencer:pathFilters=views;routes"
+  "-Wconf:src=routes/.*:s",
+  "-Wconf:cat=unused-imports&src=views/.*:s"
 )
 
 Global / excludeLintKeys += update / evictionWarningOptions
