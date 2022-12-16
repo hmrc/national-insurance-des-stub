@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sm -r --start ASSETS_FRONTEND API_DEFINITION API_DOCUMENTATION_FRONTEND
+
+sbt run

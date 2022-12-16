@@ -28,9 +28,9 @@ case class TaxYear(ty: String) {
 
 object TaxYear {
 
-  final val TaxYearRegex = """^(\d{4})-(\d{2})$"""
+  private val taxYearRegex = """^(\d{4})-(\d{2})$"""
 
-  val matchTaxYear: String => Option[Match] = new Regex(TaxYear.TaxYearRegex, "first", "second") findFirstMatchIn _
+  private val matchTaxYear: String => Option[Match] = new Regex(taxYearRegex, "first", "second") findFirstMatchIn _
 
   def isValid(taxYearReference: String): Boolean = matchTaxYear(taxYearReference) exists { r =>
     (r.group("first").toInt + 1) % 100 == r.group("second").toInt
