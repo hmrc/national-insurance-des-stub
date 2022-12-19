@@ -16,6 +16,7 @@
 
 package it
 
+import akka.stream.Materializer
 import org.scalatest.OptionValues
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.mvc.{AnyContentAsEmpty, Result}
@@ -31,27 +32,31 @@ import org.scalatest.wordspec.AnyWordSpecLike
   * Testcase to verify the capability of integration with the API platform.
   *
   * 1a, To expose API's to Third Party Developers, the service needs to make the API definition available under api/definition GET endpoint
-  * 1b, The endpoints need to be defined in an application.raml file for all versions  For all of the endpoints defined documentation will be provided and be
+  * 1b, The endpoints need to be defined in an application.yaml file for all versions  For all of the endpoints defined documentation will be provided and be
   * available under api/documentation/[version]/[endpoint name] GET endpoint
   * Example: api/documentation/1.0/Fetch-Some-Data
   */
 class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest with OptionValues with Matchers {
 
-  trait Setup {
+  private trait Setup {
+    implicit def mat: Materializer = app.injector.instanceOf[Materializer]
+
     val documentationController: DocumentationController = app.injector.instanceOf[DocumentationController]
     val request: FakeRequest[AnyContentAsEmpty.type]     = FakeRequest()
   }
 
-  "microservice" should {
+  "national-insurance-des-stub" should {
 
     "provide definition endpoint" in new Setup {
       val result: Future[Result] = documentationController.definition().apply(request)
-      status(result) shouldBe 200
+      status(result)        shouldBe OK
+      contentAsString(result) should include("\"name\": \"National Insurance Test Support\"")
     }
 
-    "provide RAML conf endpoint" in new Setup {
-      val result: Future[Result] = documentationController.raml("1.0", "application.raml")(request)
-      status(result) shouldBe 200
+    "provide YAML documentation" in new Setup {
+      val result: Future[Result] = documentationController.specification("1.0", "application.yaml")(request)
+      status(result)        shouldBe OK
+      contentAsString(result) should startWith("openapi: 3.0.3")
     }
   }
 }

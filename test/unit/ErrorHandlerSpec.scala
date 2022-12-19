@@ -18,7 +18,7 @@ package unit
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import play.api.Configuration
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -34,7 +34,7 @@ import scala.concurrent.ExecutionContext
 
 class ErrorHandlerSpec extends AnyWordSpec with MockitoSugar with Matchers {
 
-  def versionHeader: (String, String) = ACCEPT -> "application/vnd.hmrc.1.0+json"
+  private def versionHeader: (String, String) = ACCEPT -> "application/vnd.hmrc.1.0+json"
 
   private trait Test {
     val requestHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(versionHeader)
@@ -51,48 +51,50 @@ class ErrorHandlerSpec extends AnyWordSpec with MockitoSugar with Matchers {
 
     implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-    val handler = new ErrorHandler(configuration, httpAuditEvent, auditConnector)
+    val handler: ErrorHandler = new ErrorHandler(configuration, httpAuditEvent, auditConnector)
   }
 
-  "onClientError" should {
-    "return 404 with error body" when {
-      "header is supplied and message is ERROR_NOT_FOUND" in new Test {
-        private val result = handler.onClientError(requestHeader, NOT_FOUND, "test")
-        status(result) shouldBe Status.NOT_FOUND
+  "ErrorHandler" when {
+    "onClientError" should {
+      "return 404 with error body" when {
+        "header is supplied and message is ERROR_NOT_FOUND" in new Test {
+          private val result = handler.onClientError(requestHeader, NOT_FOUND, "test")
+          status(result) shouldBe Status.NOT_FOUND
 
-        contentAsJson(result) shouldBe Json.toJson(ErrorResponse(NOT_FOUND, "ERROR_NOT_FOUND"))
-      }
-    }
-
-    "return 400 with error body" when {
-      "header is supplied and message is ERROR_SA_UTR_INVALID" in new Test {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_SA_UTR_INVALID")
-        status(result) shouldBe BAD_REQUEST
-
-        contentAsJson(result) shouldBe Json.toJson(ErrorResponse(BAD_REQUEST, "ERROR_SA_UTR_INVALID"))
+          contentAsJson(result) shouldBe Json.toJson(ErrorResponse(NOT_FOUND, "ERROR_NOT_FOUND"))
+        }
       }
 
-      "header is supplied and message is ERROR_TAX_YEAR_INVALID" in new Test {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_TAX_YEAR_INVALID")
-        status(result) shouldBe BAD_REQUEST
+      "return 400 with error body" when {
+        "header is supplied and message is ERROR_SA_UTR_INVALID" in new Test {
+          private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_SA_UTR_INVALID")
+          status(result) shouldBe BAD_REQUEST
 
-        contentAsJson(result) shouldBe Json.toJson(ErrorResponse(BAD_REQUEST, "ERROR_TAX_YEAR_INVALID"))
+          contentAsJson(result) shouldBe Json.toJson(ErrorResponse(BAD_REQUEST, "ERROR_SA_UTR_INVALID"))
+        }
+
+        "header is supplied and message is ERROR_TAX_YEAR_INVALID" in new Test {
+          private val result = handler.onClientError(requestHeader, BAD_REQUEST, "ERROR_TAX_YEAR_INVALID")
+          status(result) shouldBe BAD_REQUEST
+
+          contentAsJson(result) shouldBe Json.toJson(ErrorResponse(BAD_REQUEST, "ERROR_TAX_YEAR_INVALID"))
+        }
+
+        "header is supplied and no message is specified" in new Test {
+          private val result = handler.onClientError(requestHeader, BAD_REQUEST, "")
+          status(result) shouldBe BAD_REQUEST
+
+          contentAsJson(result) shouldBe Json.toJson(ErrorResponse(BAD_REQUEST, "ERROR_BAD_REQUEST"))
+        }
       }
 
-      "header is supplied and no message is specified" in new Test {
-        private val result = handler.onClientError(requestHeader, BAD_REQUEST, "")
-        status(result) shouldBe BAD_REQUEST
+      "return 403 with message" when {
+        "header is supplied and status code is 403" in new Test {
+          private val result = handler.onClientError(requestHeader, FORBIDDEN, "test")
+          status(result) shouldBe FORBIDDEN
 
-        contentAsJson(result) shouldBe Json.toJson(ErrorResponse(BAD_REQUEST, "ERROR_BAD_REQUEST"))
-      }
-    }
-
-    "return 403 with message" when {
-      "header is supplied and status code is 403" in new Test {
-        private val result = handler.onClientError(requestHeader, FORBIDDEN, "test")
-        status(result) shouldBe FORBIDDEN
-
-        contentAsString(result) shouldBe "test"
+          contentAsString(result) shouldBe "test"
+        }
       }
     }
   }

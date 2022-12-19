@@ -1,0 +1,173 @@
+openapi: 3.0.3
+info:
+  title: National Insurance Test Support
+  version: '1.0'
+servers:
+  - url: https://test-api.service.hmrc.gov.uk
+paths:
+  /national-insurance-test-support/sa/{utr}/annual-summary/{taxYear}:
+    post:
+      summary: Create National Insurance summary test data
+      description: Lets you create National Insurance contributions test data
+      operationId: createNationalInsuranceSummaryTestData
+      parameters:
+        - $ref: '#/components/parameters/utr'
+        - $ref: '#/components/parameters/taxYear'
+        - $ref: '#/components/parameters/acceptHeader'
+        - $ref: '#/components/parameters/contentTypeHeader'
+        - $ref: '#/components/parameters/authorizationHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/nationalInsuranceTestSupportSaAnnualSummaryRequest'
+            example:
+              scenario: HAPPY_PATH_1
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/nationalInsuranceTestSupportSaAnnualSummaryResponse'
+              examples:
+                example-1:
+                  description: Example response for scenario HAPPY_PATH_1
+                  value:
+                    class1:
+                      totalNICableEarnings: 10
+                    class2:
+                      totalDue: 20
+                    maxNICsReached: false
+                example-2:
+                  description: Example response for scenario HAPPY_PATH_2
+                  value:
+                    class1:
+                      totalNICableEarnings: 17
+                    class2:
+                      totalDue: 319.57
+                    maxNICsReached: true
+      deprecated: false
+      security:
+        - application-restricted: []
+components:
+  parameters:
+    utr:
+      name: utr
+      in: path
+      description: The 10 digit self-assessment UTR for the individual.
+      required: true
+      style: simple
+      schema:
+        type: string
+        example: 2234567890
+    taxYear:
+      name: taxYear
+      in: path
+      description: The tax year for the National Insurance contribution being created.
+      required: true
+      style: simple
+      schema:
+        pattern: ^[0-9]{4}-[0-9]{2}$
+        type: string
+        example: 2016-17
+    acceptHeader:
+      name: Accept
+      in: header
+      description: Specifies the response format and the [version](/api-documentation/docs/reference-guide#versioning) of the API to be used.
+      style: simple
+      schema:
+        type: string
+        enum:
+          - application/vnd.hmrc.1.0+json
+      required: true
+    contentTypeHeader:
+      name: Content-Type
+      in: header
+      description: Specifies the format of the request body, which must be JSON.
+      style: simple
+      schema:
+        type: string
+        enum:
+          - application/json
+      required: true
+    authorizationHeader:
+      name: Authorization
+      in: header
+      description: An [OAuth 2.0 Bearer Token](/api-documentation/docs/authorisation/application-restricted-endpoints).
+      style: simple
+      schema:
+        type: string
+        example: Bearer 59fc92c1cdf0b8ef1f138a702effdbd2
+      required: true
+  securitySchemes:
+    application-restricted:
+      type: oauth2
+      description: HMRC supports OAuth 2.0 for authenticating [application-restricted](https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/application-restricted-endpoints) API requests using an OAuth 2.0 Bearer Token in the Authorization header.
+      flows:
+        clientCredentials:
+          tokenUrl: https://test-api.service.hmrc.gov.uk/oauth/token
+          scopes: {}
+  schemas:
+    class1:
+      title: class1
+      required:
+        - totalNICableEarnings
+      type: object
+      properties:
+        totalNICableEarnings:
+          type: number
+          description: Total Class 1 earnings subject to National Insurance contributions between the Primary Threshold and the Upper Earnings Limit
+          example: 10
+    class2:
+      title: class2
+      required:
+        - totalDue
+      type: object
+      properties:
+        totalDue:
+          type: number
+          description: Total Class 2 National Insurance contributions due
+          example: 10
+    nationalInsuranceTestSupportSaAnnualSummaryRequest:
+      title: nationalInsuranceTestSupportSaAnnualSummaryRequest
+      type: object
+      properties:
+        scenario:
+          oneOf:
+            - $ref: '#/components/schemas/firstScenario'
+            - $ref: '#/components/schemas/secondScenario'
+          description: The scenario to create test data for
+      description: Create National Insurance summary test data request
+    nationalInsuranceTestSupportSaAnnualSummaryResponse:
+      title: nationalInsuranceTestSupportSaAnnualSummaryResponse
+      required:
+        - class1
+        - class2
+        - maxNICsReached
+      type: object
+      properties:
+        class1:
+          $ref: '#/components/schemas/class1'
+        class2:
+          $ref: '#/components/schemas/class2'
+        maxNICsReached:
+          type: boolean
+          description: A flag indicating whether the maximum National Insurance contributions has been reached
+          example: false
+      description: Create National Insurance summary test data response
+    firstScenario:
+      title: firstScenario
+      enum:
+        - HAPPY_PATH_1
+      type: string
+      description: Standard happy path test scenario (default)
+    secondScenario:
+      title: secondScenario
+      enum:
+        - HAPPY_PATH_2
+      type: string
+      description: Happy path test scenario with different values

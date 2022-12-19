@@ -8,6 +8,6 @@ GET   /nics/utr/:utr/year/:taxYear/summary      uk.gov.hmrc.nationalinsurancedes
 # Test support API endpoints
 
 GET   /api/definition                           uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.definition()
-GET   /api/conf/:version/*file                  uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.raml(version, file)
+GET   /api/conf/:version/*file                  uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController.specification(version, file)
 
 POST  /sa/:utr/annual-summary/:taxYear          uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController.create(utr: uk.gov.hmrc.domain.SaUtr, taxYear: uk.gov.hmrc.nationalinsurancedesstub.models.TaxYear)
