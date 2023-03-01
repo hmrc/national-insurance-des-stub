@@ -1,5 +1,4 @@
 import uk.gov.hmrc.DefaultBuildSettings._
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
 lazy val appName = "national-insurance-des-stub"
 
@@ -8,11 +7,9 @@ def itTestFilter(name: String): Boolean = name startsWith "it"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
-  .settings(scalaSettings: _*)
-  .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(
-    scalaVersion := "2.12.17",
+    scalaVersion := "2.13.10",
     retrieveManaged := true,
     majorVersion := 0,
     libraryDependencies ++= AppDependencies(),
@@ -37,7 +34,6 @@ lazy val microservice = Project(appName, file("."))
     addTestReportOption(IntegrationTest, "int-test-reports")
   )
   .settings(
-    // Coverage configuration
     coverageMinimumStmtTotal := 100,
     coverageFailOnMinimum := true,
     coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"
