@@ -16,9 +16,9 @@
 
 package unit.models
 
-import play.api.Configuration
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.Configuration
 import uk.gov.hmrc.nationalinsurancedesstub.models.APIAccess
 
 class APIAccessSpec extends AnyWordSpec with Matchers {
@@ -29,11 +29,7 @@ class APIAccessSpec extends AnyWordSpec with Matchers {
 
     val configuration: Configuration = Configuration.from(
       Map(
-        s"version-$version.type"                      -> "PUBLIC",
-        s"version-$version.whitelistedApplicationIds" -> Seq(
-          "a1e8057e-fbbc-47a8-a8b4-78d9f015c253",
-          "f2fb30e5-4ab6-4a29-b3c1-c7264259ff1c"
-        )
+        s"version-$version.type" -> "PUBLIC"
       )
     )
 
@@ -48,10 +44,6 @@ class APIAccessSpec extends AnyWordSpec with Matchers {
         apiAccess.`type` shouldBe "PUBLIC"
       }
 
-      "return the configured whitelistedApplicationIds" in new Test {
-        apiAccess.whitelistedApplicationIds shouldBe
-          Some(Seq("a1e8057e-fbbc-47a8-a8b4-78d9f015c253", "f2fb30e5-4ab6-4a29-b3c1-c7264259ff1c"))
-      }
     }
 
     "configuration options are not specified" should {
@@ -62,11 +54,6 @@ class APIAccessSpec extends AnyWordSpec with Matchers {
         apiAccess.`type` shouldBe "PRIVATE"
       }
 
-      "default whitelistedApplicationIds to None" in new Test {
-        override val configuration: Configuration = Configuration.empty
-
-        apiAccess.whitelistedApplicationIds shouldBe None
-      }
     }
   }
 }

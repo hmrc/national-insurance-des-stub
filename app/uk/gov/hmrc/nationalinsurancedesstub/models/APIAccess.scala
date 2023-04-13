@@ -18,13 +18,9 @@ package uk.gov.hmrc.nationalinsurancedesstub.models
 
 import play.api.Configuration
 
-case class APIAccess(`type`: String, whitelistedApplicationIds: Option[Seq[String]])
+case class APIAccess(`type`: String)
 
 object APIAccess {
-  def build(config: Option[Configuration])(version: String): APIAccess = APIAccess(
-    `type` = config.flatMap(_.getOptional[String](s"version-$version.type")).getOrElse("PRIVATE"),
-    whitelistedApplicationIds = config.foldLeft[Option[Seq[String]]](None) { (_, conf) =>
-      conf.getOptional[Seq[String]](s"version-$version.whitelistedApplicationIds")
-    }
-  )
+  def build(config: Option[Configuration])(version: String): APIAccess =
+    APIAccess(`type` = config.flatMap(_.getOptional[String](s"version-$version.type")).getOrElse("PRIVATE"))
 }
