@@ -23,6 +23,7 @@ import play.api.http.Status.{BAD_REQUEST, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.Json
 import scalaj.http.Http
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
+
 import scala.concurrent.Await.result
 
 class NationalInsuranceSummarySpec extends BaseSpec {
@@ -165,25 +166,19 @@ class NationalInsuranceSummarySpec extends BaseSpec {
   }
 
   private def primeNationalInsuranceSummary(utr: String, taxYear: String, payload: String) =
-    postEndpoint(s"sa/$utr/annual-summary/$taxYear", payload)
-
-  private def fetchNationalInsuranceSummary(utr: String, taxYearEnd: String) =
-    getEndpoint(s"nics/utr/$utr/year/$taxYearEnd/summary")
-
-  private def getEndpoint(endpoint: String) =
-    Http(s"$serviceUrl/$endpoint").method("GET").asString
-
-  private def postEndpoint(endpoint: String, payload: String) =
-    Http(s"$serviceUrl/$endpoint")
+    Http(s"$serviceUrl/sa/$utr/annual-summary/$taxYear")
       .header(HeaderNames.CONTENT_TYPE, "application/json")
       .header(HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
       .method("POST")
       .postData(payload)
       .asString
 
+  private def fetchNationalInsuranceSummary(utr: String, taxYearEnd: String) =
+    Http(s"$serviceUrl/nics/utr/$utr/year/$taxYearEnd/summary").method("GET").asString
+
   override protected def beforeEach(): Unit = {
     val repository = app.injector.instanceOf[NationalInsuranceSummaryRepository]
     result(repository.collection.drop().toFuture(), timeout)
-    result(repository.ensureIndexes, timeout)
+    result(repository.ensureIndexes(), timeout)
   }
 }

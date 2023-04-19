@@ -28,6 +28,4 @@ package object models {
   implicit val nicsFmt: OFormat[NICs]                                            = Json.format[NICs]
   implicit val formatNationalInsuranceSummary: OFormat[NationalInsuranceSummary] = Json.format[NationalInsuranceSummary]
 
-  implicit val apiAccessFmt: OFormat[APIAccess] = Json.format[APIAccess]
-
 }

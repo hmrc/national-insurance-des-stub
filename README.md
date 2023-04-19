@@ -18,7 +18,7 @@ that is published to the [Developer Hub](https://developer.service.hmrc.gov.uk/a
     ```
      http://localhost:9688/api/conf/1.0/application.yaml
     ```
-- Ensure to uncomment the lines [here](https://github.com/hmrc/national-insurance-des-stub/blob/main/conf/application.conf#L51-L54) in case of CORS errors
+- Ensure to uncomment the lines [here](https://github.com/hmrc/national-insurance-des-stub/blob/main/conf/application.conf#L45-L48) in case of CORS errors
 
 ### On Developer Hub
 Full documentation can be found on the [Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/national-insurance-des-stub).
