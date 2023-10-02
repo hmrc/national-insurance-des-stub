@@ -16,17 +16,16 @@
 
 package it
 
-import common.util.ResourceLoader._
-import it.helpers.BaseSpec
+import it.helpers.{HttpClient, ResourceLoader}
 import play.api.http.HeaderNames
 import play.api.http.Status.{BAD_REQUEST, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.Json
-import scalaj.http.Http
+import play.api.libs.ws.StandaloneWSRequest
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
 
 import scala.concurrent.Await.result
 
-class NationalInsuranceSummarySpec extends BaseSpec {
+class NationalInsuranceSummarySpec extends HttpClient with ResourceLoader {
 
   private val validUtr   = "2234567890"
   private val invalidUtr = "INVALID"
@@ -40,8 +39,8 @@ class NationalInsuranceSummarySpec extends BaseSpec {
   private val happyPath2Payload      = """{ "scenario": "HAPPY_PATH_2" }"""
   private val invalidScenarioPayload = """{ "scenario": "NON_EXISTENT" }"""
 
-  val happyPath1FilePath = "/public/scenarios/HAPPY_PATH_1.json"
-  val happyPath2FilePath = "/public/scenarios/HAPPY_PATH_2.json"
+  private val happyPath1FilePath = "/public/scenarios/HAPPY_PATH_1.json"
+  private val happyPath2FilePath = "/public/scenarios/HAPPY_PATH_2.json"
 
   Feature("Prime National Insurance summary") {
 
@@ -50,7 +49,7 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       val response = primeNationalInsuranceSummary(invalidUtr, validTaxYear, emptyPayload)
 
       Then("The response status should be BAD REQUEST")
-      response.code shouldBe BAD_REQUEST
+      response.status shouldBe BAD_REQUEST
 
       And("The statusCode should be 400")
       (Json.parse(response.body) \ "statusCode").as[Int] shouldBe BAD_REQUEST
@@ -64,7 +63,7 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       val response = primeNationalInsuranceSummary(validUtr, invalidTaxYear, emptyPayload)
 
       Then("The response status should be BAD REQUEST")
-      response.code shouldBe BAD_REQUEST
+      response.status shouldBe BAD_REQUEST
 
       And("The statusCode should be 400")
       (Json.parse(response.body) \ "statusCode").as[Int] shouldBe BAD_REQUEST
@@ -78,7 +77,7 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath2Payload)
 
       Then("The response should indicate that the summary has been created")
-      primeResponse.code shouldBe CREATED
+      primeResponse.status shouldBe CREATED
     }
 
     Scenario("National Insurance summary cannot be primed with an invalid scenario") {
@@ -86,7 +85,7 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, invalidScenarioPayload)
 
       Then("The response code should be BAD_REQUEST")
-      primeResponse.code shouldBe BAD_REQUEST
+      primeResponse.status shouldBe BAD_REQUEST
 
       And("The error code should be UNKNOWN_SCENARIO")
       (Json.parse(primeResponse.body) \ "code").as[String] shouldBe "UNKNOWN_SCENARIO"
@@ -101,7 +100,7 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
 
       Then("The response should indicate that no data was found")
-      response.code shouldBe NOT_FOUND
+      response.status shouldBe NOT_FOUND
     }
 
     Scenario("National Insurance summary is returned when primed with specific scenario") {
@@ -109,13 +108,13 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath2Payload)
 
       Then("The response should indicate that the summary has been created")
-      primeResponse.code shouldBe CREATED
+      primeResponse.status shouldBe CREATED
 
       And("I request a National Insurance summary for the same UTR and tax year")
       val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
 
       Then("The response code should be OK")
-      response.code shouldBe OK
+      response.status shouldBe OK
 
       And("The response should contain the National Insurance summary")
       val expected = loadResource(happyPath2FilePath)
@@ -127,13 +126,13 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, emptyPayload)
 
       Then("The response should indicate that the summary has been created")
-      primeResponse.code shouldBe CREATED
+      primeResponse.status shouldBe CREATED
 
       And("I request a National Insurance summary for the same UTR and tax year")
       val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
 
       Then("The response code should be OK")
-      response.code shouldBe OK
+      response.status shouldBe OK
 
       And("The response should contain the National Insurance summary")
       val expected = loadResource(happyPath1FilePath)
@@ -145,19 +144,19 @@ class NationalInsuranceSummarySpec extends BaseSpec {
       val initialPrimeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath1Payload)
 
       Then("The response should indicate that the summary has been created")
-      initialPrimeResponse.code shouldBe CREATED
+      initialPrimeResponse.status shouldBe CREATED
 
       And("I re-prime the National Insurance summary for the same UTR and tax year with a different scenario")
       val primeResponse = primeNationalInsuranceSummary(validUtr, validTaxYear, happyPath2Payload)
 
       Then("The response should indicate that the summary has been created")
-      primeResponse.code shouldBe CREATED
+      primeResponse.status shouldBe CREATED
 
       And("I request a National Insurance summary for the same UTR and tax year")
       val response = fetchNationalInsuranceSummary(validUtr, validTaxYearEnd)
 
       Then("The response code should be OK")
-      response.code shouldBe OK
+      response.status shouldBe OK
 
       And("The response should contain the National Insurance summary for the changed scenario")
       val expected = loadResource(happyPath2FilePath)
@@ -165,16 +164,28 @@ class NationalInsuranceSummarySpec extends BaseSpec {
     }
   }
 
-  private def primeNationalInsuranceSummary(utr: String, taxYear: String, payload: String) =
-    Http(s"$serviceUrl/sa/$utr/annual-summary/$taxYear")
-      .header(HeaderNames.CONTENT_TYPE, "application/json")
-      .header(HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
-      .method("POST")
-      .postData(payload)
-      .asString
+  private def primeNationalInsuranceSummary(
+    utr: String,
+    taxYear: String,
+    payload: String
+  ): StandaloneWSRequest#Self#Response =
+    result(
+      awaitable = post(
+        url = s"$serviceUrl/sa/$utr/annual-summary/$taxYear",
+        requestBody = payload,
+        headers = Seq(
+          (HeaderNames.CONTENT_TYPE, "application/json"),
+          (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+        )
+      ),
+      atMost = timeout
+    )
 
-  private def fetchNationalInsuranceSummary(utr: String, taxYearEnd: String) =
-    Http(s"$serviceUrl/nics/utr/$utr/year/$taxYearEnd/summary").method("GET").asString
+  private def fetchNationalInsuranceSummary(utr: String, taxYearEnd: String): StandaloneWSRequest#Response =
+    result(
+      awaitable = get(url = s"$serviceUrl/nics/utr/$utr/year/$taxYearEnd/summary"),
+      atMost = timeout
+    )
 
   override protected def beforeEach(): Unit = {
     val repository = app.injector.instanceOf[NationalInsuranceSummaryRepository]

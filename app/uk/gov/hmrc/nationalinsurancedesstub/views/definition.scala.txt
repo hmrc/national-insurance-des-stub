@@ -1,4 +1,4 @@
-@()
+@(apiStatus: String)
 {
   "scopes":[],
   "api": {
@@ -9,7 +9,7 @@
     "versions": [
       {
         "version": "1.0",
-        "status": "BETA",
+        "status": "@apiStatus",
         "endpointsEnabled": true
       }
     ]

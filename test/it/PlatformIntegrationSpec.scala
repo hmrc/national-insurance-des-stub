@@ -17,7 +17,6 @@
 package it
 
 import akka.stream.Materializer
-import org.scalatest.OptionValues
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
@@ -27,6 +26,7 @@ import uk.gov.hmrc.nationalinsurancedesstub.controllers.DocumentationController
 import scala.concurrent.Future
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
+import play.api.libs.json.{JsValue, Json}
 
 /**
   * Testcase to verify the capability of integration with the API platform.
@@ -36,7 +36,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
   * available under api/documentation/[version]/[endpoint name] GET endpoint
   * Example: api/documentation/1.0/Fetch-Some-Data
   */
-class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest with OptionValues with Matchers {
+class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest with Matchers {
 
   private trait Setup {
     implicit def mat: Materializer = app.injector.instanceOf[Materializer]
@@ -46,11 +46,31 @@ class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest wi
   }
 
   "national-insurance-des-stub" should {
-
     "provide definition endpoint" in new Setup {
+      val apiDefinitionJson: JsValue = Json.parse(
+        """
+         |{
+         |    "scopes": [],
+         |    "api": {
+         |        "name": "National Insurance Test Support",
+         |        "description": "Lets you set up data for the National Insurance API.",
+         |        "context": "national-insurance-test-support",
+         |        "isTestSupport": true,
+         |        "versions": [
+         |            {
+         |                "version": "1.0",
+         |                "status": "BETA",
+         |                "endpointsEnabled": true
+         |            }
+         |        ]
+         |    }
+         |}
+       """.stripMargin
+      )
+
       val result: Future[Result] = documentationController.definition().apply(request)
       status(result)        shouldBe OK
-      contentAsString(result) should include("\"name\": \"National Insurance Test Support\"")
+      contentAsJson(result) shouldBe apiDefinitionJson
     }
 
     "provide YAML documentation" in new Setup {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package common.util
+package it.helpers
 
 import scala.io.Source
 
@@ -26,5 +26,3 @@ trait ResourceLoader {
     finally resource.close()
   }
 }
-
-object ResourceLoader extends ResourceLoader

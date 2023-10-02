@@ -1,4 +1,4 @@
-import uk.gov.hmrc.DefaultBuildSettings._
+import uk.gov.hmrc.DefaultBuildSettings.*
 
 lazy val appName = "national-insurance-des-stub"
 
@@ -7,10 +7,8 @@ def itTestFilter(name: String): Boolean = name startsWith "it"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
-  .settings(defaultSettings(): _*)
   .settings(
-    scalaVersion := "2.13.11",
-    retrieveManaged := true,
+    scalaVersion := "2.13.12",
     majorVersion := 0,
     libraryDependencies ++= AppDependencies(),
     // To resolve a bug with version 2.x.x of the scoverage plugin - https://github.com/sbt/sbt/issues/6997
@@ -21,13 +19,11 @@ lazy val microservice = Project(appName, file("."))
   .settings(Compile / unmanagedResourceDirectories += baseDirectory.value / "resources")
   .settings(
     Test / fork := true,
-    Test / javaOptions += "-Dconfig.resource=test.application.conf",
     Test / testOptions := Seq(Tests.Filter(unitFilter)),
     addTestReportOption(Test, "test-reports")
   )
   .configs(IntegrationTest)
   .settings(
-    inConfig(IntegrationTest)(Defaults.itSettings),
     integrationTestSettings(),
     IntegrationTest / testOptions := Seq(Tests.Filter(itTestFilter)),
     IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "test")).value,
@@ -36,7 +32,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     coverageMinimumStmtTotal := 100,
     coverageFailOnMinimum := true,
-    coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;.*definition.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"
+    coverageExcludedPackages := "<empty>;.*(Routes|definition).*"
   )
   .settings(
     scalacOptions ++= Seq(
@@ -44,7 +40,7 @@ lazy val microservice = Project(appName, file("."))
       "-Wconf:cat=unused-imports&src=views/.*:s"
     )
   )
-  .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
+  .disablePlugins(JUnitXmlReportPlugin)
 
-addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt")
-addCommandAlias("scalastyleAll", "all scalastyle Test/scalastyle")
+addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt IntegrationTest/scalafmt")
+addCommandAlias("scalastyleAll", "all scalastyle Test/scalastyle IntegrationTest/scalastyle")

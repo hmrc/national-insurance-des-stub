@@ -19,14 +19,16 @@ package uk.gov.hmrc.nationalinsurancedesstub.controllers
 import javax.inject.{Inject, Singleton}
 import controllers.Assets
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.nationalinsurancedesstub.config.AppConfig
 import uk.gov.hmrc.nationalinsurancedesstub.views.txt
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 @Singleton
-class DocumentationController @Inject() (assets: Assets, val cc: ControllerComponents) extends BackendController(cc) {
+class DocumentationController @Inject() (appConfig: AppConfig, assets: Assets, val cc: ControllerComponents)
+    extends BackendController(cc) {
 
   def definition: Action[AnyContent] = Action {
-    Ok(txt.definition()).withHeaders(CONTENT_TYPE -> JSON)
+    Ok(txt.definition(appConfig.apiStatus)).withHeaders(CONTENT_TYPE -> JSON)
   }
 
   def specification(version: String, file: String): Action[AnyContent] = assets.at(s"/public/api/conf/$version", file)
