@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package it
-
-import it.helpers.{HttpClient, ResourceLoader}
+import helpers.{BaseSpec, HttpClient, ResourceLoader}
 import play.api.http.HeaderNames
 import play.api.http.Status.{BAD_REQUEST, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.Json
@@ -25,7 +23,7 @@ import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummar
 
 import scala.concurrent.Await.result
 
-class NationalInsuranceSummarySpec extends HttpClient with ResourceLoader {
+class NationalInsuranceSummarySpec extends BaseSpec with HttpClient with ResourceLoader {
 
   private val validUtr   = "2234567890"
   private val invalidUtr = "INVALID"
