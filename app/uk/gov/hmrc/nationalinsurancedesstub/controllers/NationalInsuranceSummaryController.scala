@@ -27,19 +27,19 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class NationalInsuranceSummaryController @Inject()(
-                                                    val scenarioLoader: ScenarioLoader,
-                                                    val service: NationalInsuranceSummaryService,
-                                                    val cc: ControllerComponents
-                                                  ) extends BackendController(cc)
-  with HeaderValidator {
+class NationalInsuranceSummaryController @Inject() (
+  val scenarioLoader: ScenarioLoader,
+  val service: NationalInsuranceSummaryService,
+  val cc: ControllerComponents
+) extends BackendController(cc)
+    with HeaderValidator {
 
   implicit val executionContext: ExecutionContext = cc.executionContext
 
   def fetch(utr: String, taxEndYear: String): Action[AnyContent] = Action.async {
     service.fetch(utr, taxEndYear) map {
       case Some(result) => Ok(Json.toJson(result.nics))
-      case _ => NotFound
+      case _            => NotFound
     } recover { case _ =>
       InternalServerError
     }
@@ -53,12 +53,12 @@ class NationalInsuranceSummaryController @Inject()(
 
           for {
             nics <- scenarioLoader.loadScenario(scenario)
-            _ <- service.create(saUtr.utr, taxYear.endYr, nics)
+            _    <- service.create(saUtr.utr, taxYear.endYr, nics)
           } yield Created(Json.toJson(nics))
 
         } recover {
           case _: InvalidScenarioException => BadRequest(JsonErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))
-          case _ => InternalServerError
+          case _                           => InternalServerError
         }
     }
 }
