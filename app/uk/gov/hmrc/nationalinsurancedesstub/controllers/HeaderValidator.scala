@@ -27,10 +27,10 @@ trait HeaderValidator extends Results {
 
   def cc: ControllerComponents
 
-  def validateVersion[T](allowed: Seq[T], version: T): Boolean =
+  private def validateVersion[T](allowed: Seq[T], version: T): Boolean =
     allowed.contains(version)
 
-  def validateContentType(contentType: String): Boolean =
+  private def validateContentType(contentType: String): Boolean =
     contentType == "json"
 
   private val matchHeader: String => Option[Match] =
