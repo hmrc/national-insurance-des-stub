@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ object ErrorTaxYearInvalid extends ErrorResponse(BAD_REQUEST, "ERROR_TAX_YEAR_IN
 object ErrorGenericBadRequest extends ErrorResponse(BAD_REQUEST, "ERROR_BAD_REQUEST")
 
 object ErrorNotFound extends ErrorResponse(NOT_FOUND, "ERROR_NOT_FOUND")
+
+object ErrorAcceptHeaderInvalid extends ErrorResponse(NOT_ACCEPTABLE, "ACCEPT_HEADER_INVALID")
 
 object ErrorResponse {
   implicit def errorResponseWrites[T <: ErrorResponse]: Writes[T] = (e: ErrorResponse) =>

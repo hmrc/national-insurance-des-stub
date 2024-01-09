@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package unit.controllers
+package controllers
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import org.mockito.ArgumentMatchers.{eq => argEq}
 import org.mockito.BDDMockito.given
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.OptionValues
 import org.mockito.MockitoSugar
+import org.scalatest.OptionValues
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.http.HeaderNames
@@ -38,8 +40,6 @@ import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummarySe
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 
 class NationalInsuranceSummaryControllerSpec
     extends AnyWordSpec
@@ -49,20 +49,20 @@ class NationalInsuranceSummaryControllerSpec
     with GuiceOneServerPerSuite
     with ScalaFutures {
 
-  override lazy val fakeApplication: Application = GuiceApplicationBuilder(
-    disabled = Seq(classOf[com.kenshoo.play.metrics.PlayModule])
-  ).build()
+  override lazy val fakeApplication: Application =
+    GuiceApplicationBuilder().build()
 
   private val request: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
   implicit val headerCarrier: HeaderCarrier                = HeaderCarrier()
   implicit val mat: Materializer                           = fakeApplication.materializer
 
-  private val underTest: NationalInsuranceSummaryController = new NationalInsuranceSummaryController(
-    mock[ScenarioLoader],
-    mock[NationalInsuranceSummaryService],
-    stubControllerComponents()
-  )
+  private val underTest: NationalInsuranceSummaryController =
+    new NationalInsuranceSummaryController(
+      mock[ScenarioLoader],
+      mock[NationalInsuranceSummaryService],
+      stubControllerComponents()
+    )
 
   private def request(jsonPayload: JsValue): FakeRequest[JsValue]          =
     FakeRequest().withHeaders(HeaderNames.ACCEPT -> "application/vnd.hmrc.1.0+json").withBody[JsValue](jsonPayload)
@@ -76,7 +76,9 @@ class NationalInsuranceSummaryControllerSpec
   private val nics: NICs = NICs(Class1NICs(10.0), Class2NICs(20.0), maxNICsReached = false)
 
   "NationalInsuranceSummaryController" when {
+
     "fetch" should {
+
       "return the happy path response when called with a utr and tax year that are found" in {
         given(underTest.service.fetch(argEq("2234567890"), argEq("2014")))
           .willReturn(Future(Some(NationalInsuranceSummary("2234567890", "2014", nics))))
@@ -148,6 +150,22 @@ class NationalInsuranceSummaryControllerSpec
 
         status(result)                              shouldBe BAD_REQUEST
         (contentAsJson(result) \ "code").as[String] shouldBe "UNKNOWN_SCENARIO"
+      }
+
+      "return a NOT_ACCEPTABLE when the request does not contain a 'Accept' header" in {
+        given(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_1"))).willReturn(Future.successful(nics))
+        given(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
+          .willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
+
+        val wrongHeaderRequest =
+          FakeRequest()
+            .withHeaders("No Accept header" -> "haha")
+            .withBody[JsValue](Json.parse("{}"))
+
+        val result = underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(wrongHeaderRequest)
+
+        status(result)                                 shouldBe NOT_ACCEPTABLE
+        (contentAsJson(result) \ "message").as[String] shouldBe "ACCEPT_HEADER_INVALID"
       }
     }
   }
