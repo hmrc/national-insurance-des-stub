@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import org.mockito.MockitoSugar
+import org.mockito.Mockito
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.Configuration
@@ -30,15 +30,15 @@ import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 
 import scala.concurrent.ExecutionContext
 
-class ErrorHandlerSpec extends AnyWordSpec with MockitoSugar with Matchers {
+class ErrorHandlerSpec extends AnyWordSpec with Matchers {
 
   private def versionHeader: (String, String) = ACCEPT -> "application/vnd.hmrc.1.0+json"
 
   private trait Test {
     val requestHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(versionHeader)
 
-    val auditConnector: AuditConnector = mock[AuditConnector]
-    val httpAuditEvent: HttpAuditEvent = mock[HttpAuditEvent]
+    val auditConnector: AuditConnector = Mockito.mock(classOf[AuditConnector])
+    val httpAuditEvent: HttpAuditEvent = Mockito.mock(classOf[HttpAuditEvent])
 
     val configuration: Configuration = Configuration(
       "appName"                                         -> "myApp",

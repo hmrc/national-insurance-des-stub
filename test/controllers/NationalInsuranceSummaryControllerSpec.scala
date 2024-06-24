@@ -19,7 +19,7 @@ package controllers
 import org.apache.pekko.stream.Materializer
 import org.mockito.ArgumentMatchers.{eq => argEq}
 import org.mockito.BDDMockito.given
-import org.mockito.MockitoSugar
+import org.mockito.Mockito
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -45,7 +45,6 @@ class NationalInsuranceSummaryControllerSpec
     extends AnyWordSpec
     with Matchers
     with OptionValues
-    with MockitoSugar
     with GuiceOneServerPerSuite
     with ScalaFutures {
 
@@ -59,8 +58,8 @@ class NationalInsuranceSummaryControllerSpec
 
   private val underTest: NationalInsuranceSummaryController =
     new NationalInsuranceSummaryController(
-      mock[ScenarioLoader],
-      mock[NationalInsuranceSummaryService],
+      Mockito.mock(classOf[ScenarioLoader]),
+      Mockito.mock(classOf[NationalInsuranceSummaryService]),
       stubControllerComponents()
     )
 

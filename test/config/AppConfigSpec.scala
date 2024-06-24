@@ -16,8 +16,8 @@
 
 package config
 
+import org.mockito.Mockito
 import org.mockito.Mockito.when
-import org.mockito.MockitoSugar.mock
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.nationalinsurancedesstub.config.AppConfig
@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 class AppConfigSpec extends AnyWordSpec with Matchers {
 
   private val apiStatuses: Seq[String]           = Seq("ALPHA", "BETA", "STABLE", "DEPRECATED", "RETIRED")
-  private val mockServicesConfig: ServicesConfig = mock[ServicesConfig]
+  private val mockServicesConfig: ServicesConfig = Mockito.mock(classOf[ServicesConfig])
 
   private class Setup(apiStatus: String) {
     when(mockServicesConfig.getString("api.status")).thenReturn(apiStatus)
