@@ -22,8 +22,11 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/nationalInsuranceTestSupportSaAnnualSummaryRequest'
-            example:
-              scenario: HAPPY_PATH_1
+            examples:
+              happy-path-1:
+                $ref: '#/components/examples/requestHappyPath1'
+              happy-path-2:
+                $ref: '#/components/examples/requestHappyPath2'
         required: true
       responses:
         '201':
@@ -34,26 +37,39 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/nationalInsuranceTestSupportSaAnnualSummaryResponse'
               examples:
-                example-1:
-                  description: Example response for scenario HAPPY_PATH_1
-                  value:
-                    class1:
-                      totalNICableEarnings: 10
-                    class2:
-                      totalDue: 20
-                    maxNICsReached: false
-                example-2:
-                  description: Example response for scenario HAPPY_PATH_2
-                  value:
-                    class1:
-                      totalNICableEarnings: 17
-                    class2:
-                      totalDue: 319.57
-                    maxNICsReached: true
+                happy-path-1:
+                  $ref: '#/components/examples/responseHappyPath1'
+                happy-path-2:
+                  $ref: '#/components/examples/responseHappyPath2'
       deprecated: false
       security:
         - application-restricted: []
 components:
+  examples:
+    requestHappyPath1:
+      description: Payload for scenario HAPPY_PATH_1
+      value:
+        scenario: HAPPY_PATH_1
+    requestHappyPath2:
+      description: Payload for scenario HAPPY_PATH_2
+      value:
+        scenario: HAPPY_PATH_2
+    responseHappyPath1:
+      description: Response for scenario HAPPY_PATH_1
+      value:
+        class1:
+          totalNICableEarnings: 10
+        class2:
+          totalDue: 20
+        maxNICsReached: false
+    responseHappyPath2:
+      description: Response for scenario HAPPY_PATH_2
+      value:
+        class1:
+          totalNICableEarnings: 17
+        class2:
+          totalDue: 319.57
+        maxNICsReached: true
   parameters:
     utr:
       name: utr
@@ -140,7 +156,7 @@ components:
           oneOf:
             - $ref: '#/components/schemas/firstScenario'
             - $ref: '#/components/schemas/secondScenario'
-          description: The scenario to create test data for
+          description: The scenario to create test data for National Insurance
       description: Create National Insurance summary test data request
     nationalInsuranceTestSupportSaAnnualSummaryResponse:
       title: nationalInsuranceTestSupportSaAnnualSummaryResponse
