@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package helpers
+package it.helpers
 
 import org.apache.pekko.actor.ActorSystem
 import play.api.libs.ws.StandaloneWSRequest

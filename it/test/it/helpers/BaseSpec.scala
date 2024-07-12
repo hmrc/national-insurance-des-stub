@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package helpers
+package it.helpers
 
 import java.util.concurrent.TimeUnit
 import org.scalatest._

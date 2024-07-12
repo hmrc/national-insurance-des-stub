@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package helpers
+package it.helpers
 
 import scala.io.Source
 
