@@ -8,7 +8,7 @@ object AppDependencies {
     "uk.gov.hmrc"                  %% "bootstrap-backend-play-30" % bootstrapPlayVersion,
     "uk.gov.hmrc"                  %% "domain-play-30"            % "10.0.0",
     "uk.gov.hmrc.mongo"            %% "hmrc-mongo-play-30"        % hmrcMongoPlayVersion,
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.1"
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.2"
   )
 
   private val test: Seq[ModuleID] = Seq(
