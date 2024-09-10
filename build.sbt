@@ -3,7 +3,7 @@ import uk.gov.hmrc.DefaultBuildSettings.*
 lazy val appName = "national-insurance-des-stub"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.14"
+ThisBuild / scalaVersion := "3.4.2"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
