@@ -16,6 +16,6 @@ object AppDependencies {
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-test-play-30" % hmrcMongoPlayVersion
   ).map(_ % Test)
 
-  def apply(): Seq[ModuleID]      = compile ++ test
+  def apply(): Seq[ModuleID] = compile ++ test
 
 }
