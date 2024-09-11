@@ -15,7 +15,7 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(Compile / unmanagedResourceDirectories += baseDirectory.value / "resources")
   .settings(
-    (scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all")))
+    scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all"))
   )
   .disablePlugins(JUnitXmlReportPlugin)
 

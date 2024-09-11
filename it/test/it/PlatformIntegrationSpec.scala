@@ -67,7 +67,7 @@ class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest wi
        """.stripMargin
       )
 
-      val result: Future[Result] = documentationController.definition().apply(request)
+      val result: Future[Result] = documentationController.definition.apply(request)
       status(result)        shouldBe OK
       contentAsJson(result) shouldBe apiDefinitionJson
     }

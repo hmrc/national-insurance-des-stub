@@ -48,13 +48,12 @@ class NationalInsuranceSummaryControllerSpec
     with GuiceOneServerPerSuite
     with ScalaFutures {
 
-  override lazy val fakeApplication: Application =
-    GuiceApplicationBuilder().build()
+  override lazy val app: Application = GuiceApplicationBuilder().build()
 
   private val request: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
   implicit val headerCarrier: HeaderCarrier                = HeaderCarrier()
-  implicit val mat: Materializer                           = fakeApplication.materializer
+  implicit val mat: Materializer                           = app.materializer
 
   private val underTest: NationalInsuranceSummaryController =
     new NationalInsuranceSummaryController(
