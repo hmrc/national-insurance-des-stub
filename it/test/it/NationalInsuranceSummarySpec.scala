@@ -38,7 +38,7 @@ import play.api.http.Status.{BAD_REQUEST, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.Json
 import play.api.libs.ws.{StandaloneWSRequest, StandaloneWSResponse}
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
-import org.mongodb.scala.gridfs.SingleObservableFuture
+import org.mongodb.scala.{ObservableFuture, SingleObservableFuture}
 
 import scala.concurrent.Await.result
 
