@@ -20,12 +20,11 @@ import org.bson.types.ObjectId
 import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.mongo.play.json.formats.MongoFormats
 
-package object models {
+package models {
   implicit val formatObjectId: Format[ObjectId]                                  = MongoFormats.objectIdFormat
   implicit val formatCreateSummaryRequest: OFormat[CreateSummaryRequest]         = Json.format[CreateSummaryRequest]
   implicit val class1nicsFmt: OFormat[Class1NICs]                                = Json.format[Class1NICs]
   implicit val class2nicsFmt: OFormat[Class2NICs]                                = Json.format[Class2NICs]
   implicit val nicsFmt: OFormat[NICs]                                            = Json.format[NICs]
   implicit val formatNationalInsuranceSummary: OFormat[NationalInsuranceSummary] = Json.format[NationalInsuranceSummary]
-
 }
