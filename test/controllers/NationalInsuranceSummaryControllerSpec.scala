@@ -17,8 +17,8 @@
 package controllers
 
 import org.apache.pekko.stream.Materializer
-import org.mockito.ArgumentMatchers.{eq => argEq}
-import org.mockito.BDDMockito.given
+import org.mockito.ArgumentMatchers.eq as argEq
+import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
@@ -35,7 +35,7 @@ import play.api.test.Helpers.{contentAsJson, _}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationalinsurancedesstub.controllers.NationalInsuranceSummaryController
-import uk.gov.hmrc.nationalinsurancedesstub.models._
+import uk.gov.hmrc.nationalinsurancedesstub.models.*
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -48,13 +48,12 @@ class NationalInsuranceSummaryControllerSpec
     with GuiceOneServerPerSuite
     with ScalaFutures {
 
-  override lazy val fakeApplication: Application =
-    GuiceApplicationBuilder().build()
+  override lazy val app: Application = GuiceApplicationBuilder().build()
 
   private val request: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
   implicit val headerCarrier: HeaderCarrier                = HeaderCarrier()
-  implicit val mat: Materializer                           = fakeApplication.materializer
+  implicit val mat: Materializer                           = app.materializer
 
   private val underTest: NationalInsuranceSummaryController =
     new NationalInsuranceSummaryController(
@@ -63,7 +62,7 @@ class NationalInsuranceSummaryControllerSpec
       stubControllerComponents()
     )
 
-  private def request(jsonPayload: JsValue): FakeRequest[JsValue]          =
+  private def request(jsonPayload: JsValue): FakeRequest[JsValue] =
     FakeRequest().withHeaders(HeaderNames.ACCEPT -> "application/vnd.hmrc.1.0+json").withBody[JsValue](jsonPayload)
 
   private def createSummaryRequest(scenario: String): FakeRequest[JsValue] =
@@ -79,7 +78,7 @@ class NationalInsuranceSummaryControllerSpec
     "fetch" should {
 
       "return the happy path response when called with a utr and tax year that are found" in {
-        given(underTest.service.fetch(argEq("2234567890"), argEq("2014")))
+        `given`(underTest.service.fetch(argEq("2234567890"), argEq("2014")))
           .willReturn(Future(Some(NationalInsuranceSummary("2234567890", "2014", nics))))
 
         val result: Future[Result] = underTest.fetch("2234567890", "2014")(request)
@@ -89,7 +88,7 @@ class NationalInsuranceSummaryControllerSpec
       }
 
       "return a not found response when called with a utr and taxYear that are not found" in {
-        given(underTest.service.fetch(argEq("2234567890"), argEq("2014"))).willReturn(Future(None))
+        `given`(underTest.service.fetch(argEq("2234567890"), argEq("2014"))).willReturn(Future(None))
 
         val result: Result = underTest.fetch("2234567890", "2014")(request).futureValue
 
@@ -97,7 +96,7 @@ class NationalInsuranceSummaryControllerSpec
       }
 
       "return an invalid server error when the service fails" in {
-        given(underTest.service.fetch(argEq("2234567890"), argEq("2014")))
+        `given`(underTest.service.fetch(argEq("2234567890"), argEq("2014")))
           .willReturn(Future.failed(new RuntimeException("expected test error")))
 
         val result: Result = underTest.fetch("2234567890", "2014")(request).futureValue
@@ -108,8 +107,8 @@ class NationalInsuranceSummaryControllerSpec
 
     "create" should {
       "return a created response and store the National Insurance summary" in {
-        given(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_2"))).willReturn(Future.successful(nics))
-        given(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
+        `given`(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_2"))).willReturn(Future.successful(nics))
+        `given`(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
           .willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
 
         val result: Result =
@@ -120,8 +119,8 @@ class NationalInsuranceSummaryControllerSpec
       }
 
       "default to Happy Path Scenario 1 when no scenario is specified in the request" in {
-        given(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_1"))).willReturn(Future.successful(nics))
-        given(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
+        `given`(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_1"))).willReturn(Future.successful(nics))
+        `given`(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
           .willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
 
         val result: Result = underTest.create(SaUtr("2234567890"), TaxYear("2014-15"))(emptyRequest).futureValue
@@ -131,8 +130,8 @@ class NationalInsuranceSummaryControllerSpec
       }
 
       "return an invalid server error when the repository fails" in {
-        given(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_2"))).willReturn(Future.successful(nics))
-        given(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
+        `given`(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_2"))).willReturn(Future.successful(nics))
+        `given`(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
           .willReturn(Future.failed(new RuntimeException("expected test error")))
 
         val result: Future[Result] =
@@ -141,7 +140,7 @@ class NationalInsuranceSummaryControllerSpec
       }
 
       "return a bad request when the scenario is invalid" in {
-        given(underTest.scenarioLoader.loadScenario(argEq("INVALID")))
+        `given`(underTest.scenarioLoader.loadScenario(argEq("INVALID")))
           .willReturn(Future.failed(new InvalidScenarioException("INVALID")))
 
         val result: Future[Result] =
@@ -152,8 +151,8 @@ class NationalInsuranceSummaryControllerSpec
       }
 
       "return a NOT_ACCEPTABLE when the request does not contain a 'Accept' header" in {
-        given(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_1"))).willReturn(Future.successful(nics))
-        given(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
+        `given`(underTest.scenarioLoader.loadScenario(argEq("HAPPY_PATH_1"))).willReturn(Future.successful(nics))
+        `given`(underTest.service.create(argEq("2234567890"), argEq("2015"), argEq(nics)))
           .willReturn(Future.successful(NationalInsuranceSummary("2234567890", "2015", nics)))
 
         val wrongHeaderRequest =

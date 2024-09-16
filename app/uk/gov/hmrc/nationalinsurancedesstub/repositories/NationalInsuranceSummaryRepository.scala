@@ -24,6 +24,7 @@ import org.mongodb.scala.model.FindOneAndReplaceOptions
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import org.mongodb.scala.{ObservableFuture, SingleObservableFuture}
 
 @Singleton
 class NationalInsuranceSummaryRepository @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext)

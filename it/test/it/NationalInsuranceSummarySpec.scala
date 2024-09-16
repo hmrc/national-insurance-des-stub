@@ -36,8 +36,9 @@ import it.helpers.{BaseSpec, HttpClient, ResourceLoader}
 import play.api.http.HeaderNames
 import play.api.http.Status.{BAD_REQUEST, CREATED, NOT_FOUND, OK}
 import play.api.libs.json.Json
-import play.api.libs.ws.StandaloneWSRequest
+import play.api.libs.ws.{StandaloneWSRequest, StandaloneWSResponse}
 import uk.gov.hmrc.nationalinsurancedesstub.repositories.NationalInsuranceSummaryRepository
+import org.mongodb.scala.{ObservableFuture, SingleObservableFuture}
 
 import scala.concurrent.Await.result
 
@@ -184,7 +185,7 @@ class NationalInsuranceSummarySpec extends BaseSpec with HttpClient with Resourc
     utr: String,
     taxYear: String,
     payload: String
-  ): StandaloneWSRequest#Self#Response =
+  ): StandaloneWSResponse =
     result(
       awaitable = post(
         url = s"$serviceUrl/sa/$utr/annual-summary/$taxYear",

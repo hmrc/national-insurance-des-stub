@@ -17,7 +17,7 @@
 package uk.gov.hmrc.nationalinsurancedesstub.controllers
 
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
@@ -46,19 +46,19 @@ class NationalInsuranceSummaryController @Inject() (
   }
 
   def create(saUtr: SaUtr, taxYear: TaxYear): Action[JsValue] =
-    (cc.actionBuilder andThen validateAccept(acceptHeaderValidationRules("1.0", "1.1"))).async(parse.json) {
-      implicit request =>
-        withJsonBody[CreateSummaryRequest] { createSummaryRequest =>
-          val scenario = createSummaryRequest.scenario.getOrElse("HAPPY_PATH_1")
+    (cc.actionBuilder andThen validateAccept(acceptHeaderValidationRules("1.0", "1.1"))).async(parse.json) { request =>
+      given Request[JsValue] = request
+      withJsonBody[CreateSummaryRequest] { createSummaryRequest =>
+        val scenario = createSummaryRequest.scenario.getOrElse("HAPPY_PATH_1")
 
-          for {
-            nics <- scenarioLoader.loadScenario(scenario)
-            _    <- service.create(saUtr.utr, taxYear.endYr, nics)
-          } yield Created(Json.toJson(nics))
+        for {
+          nics <- scenarioLoader.loadScenario(scenario)
+          _    <- service.create(saUtr.utr, taxYear.endYr, nics)
+        } yield Created(Json.toJson(nics))
 
-        } recover {
-          case _: InvalidScenarioException => BadRequest(JsonErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))
-          case _                           => InternalServerError
-        }
+      } recover {
+        case _: InvalidScenarioException => BadRequest(JsonErrorResponse("UNKNOWN_SCENARIO", "Unknown test scenario"))
+        case _                           => InternalServerError
+      }
     }
 }
