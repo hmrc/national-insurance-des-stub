@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.nationalinsurancedesstub.controllers
 
-import play.api.libs.json.*
+import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.nationalinsurancedesstub.models.*
+import uk.gov.hmrc.nationalinsurancedesstub.models._
 import uk.gov.hmrc.nationalinsurancedesstub.services.{NationalInsuranceSummaryService, ScenarioLoader}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
