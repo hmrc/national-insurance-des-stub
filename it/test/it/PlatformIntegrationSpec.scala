@@ -49,7 +49,6 @@ class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest wi
       val apiDefinitionJson: JsValue = Json.parse(
         """
          |{
-         |    "scopes": [],
          |    "api": {
          |        "name": "National Insurance Test Support",
          |        "description": "Lets you set up data for the National Insurance API.",
