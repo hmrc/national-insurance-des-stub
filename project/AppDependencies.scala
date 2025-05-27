@@ -1,14 +1,14 @@
 import sbt.*
 
 object AppDependencies {
-  private lazy val bootstrapPlayVersion = "9.9.0"
-  private lazy val hmrcMongoPlayVersion = "2.5.0"
+  private lazy val bootstrapPlayVersion = "9.12.0"
+  private lazy val hmrcMongoPlayVersion = "2.6.0"
 
   private lazy val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"                  %% "bootstrap-backend-play-30" % bootstrapPlayVersion,
-    "uk.gov.hmrc"                  %% "domain-play-30"            % "10.0.0",
+    "uk.gov.hmrc"                  %% "domain-play-30"            % "12.1.0",
     "uk.gov.hmrc.mongo"            %% "hmrc-mongo-play-30"        % hmrcMongoPlayVersion,
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.18.2"
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.19.0"
   )
 
   private val test: Seq[ModuleID] = Seq(
