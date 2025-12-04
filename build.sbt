@@ -17,6 +17,9 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     scalacOptions := scalacOptions.value.diff(Seq("-Wunused:all"))
   )
+  .settings(scalacOptions ~= { options =>
+    options.distinct
+  })
   .disablePlugins(JUnitXmlReportPlugin)
 
 lazy val it = project
