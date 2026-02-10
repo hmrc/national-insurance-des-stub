@@ -18,13 +18,12 @@ package uk.gov.hmrc.nationalinsurancedesstub.repositories
 
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.nationalinsurancedesstub.models._
-import org.mongodb.scala.model.Filters._
-import org.mongodb.scala.model.FindOneAndReplaceOptions
+import uk.gov.hmrc.nationalinsurancedesstub.models.*
+import org.mongodb.scala.model.Filters.*
+import org.mongodb.scala.model.{FindOneAndReplaceOptions, IndexModel, IndexOptions, Indexes}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import org.mongodb.scala.{ObservableFuture, SingleObservableFuture}
 
 @Singleton
 class NationalInsuranceSummaryRepository @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext)
@@ -32,7 +31,12 @@ class NationalInsuranceSummaryRepository @Inject() (mongo: MongoComponent)(impli
       mongoComponent = mongo,
       collectionName = "national-insurance-summary",
       domainFormat = formatNationalInsuranceSummary,
-      indexes = Seq.empty
+      indexes = Seq(
+        IndexModel(
+          Indexes.ascending("utr", "taxYear"),
+          IndexOptions().name("national-insurance-utr-taxYear").unique(true)
+        )
+      )
     ) {
 
   def store(nationalInsuranceSummary: NationalInsuranceSummary): Future[NationalInsuranceSummary] =
