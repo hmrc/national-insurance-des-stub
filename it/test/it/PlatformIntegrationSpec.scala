@@ -57,7 +57,7 @@ class PlatformIntegrationSpec extends AnyWordSpecLike with GuiceOneAppPerTest wi
          |        "versions": [
          |            {
          |                "version": "1.0",
-         |                "status": "BETA",
+         |                "status": "STABLE",
          |                "endpointsEnabled": true
          |            }
          |        ]
